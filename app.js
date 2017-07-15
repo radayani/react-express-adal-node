@@ -31,9 +31,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/',login);
+// app.use('/',login);
 
-app.use('/index', index);
+app.use('/', index);
 app.use('/users', users);
 app.use('/votedProjects', votedProjects);
 app.use('/registeredProjects', registeredProjects);
