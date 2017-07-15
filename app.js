@@ -11,12 +11,17 @@ var bodyParser = require('body-parser');
 
 var login = require('./routes/login');
 var index = require('./routes/index');
+var users = require('./routes/users');
 var votedProjects = require('./routes/votedProjects');
 var registeredProjects = require('./routes/registeredProjects');
 
 
 var app = express();
-
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 // server side view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -29,6 +34,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/',login);
 
 app.use('/index', index);
+app.use('/users', users);
 app.use('/votedProjects', votedProjects);
 app.use('/registeredProjects', registeredProjects);
 
