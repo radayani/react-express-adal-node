@@ -7,7 +7,9 @@ var AuthenticationContext = require('adal-node').AuthenticationContext;
 
 
 var router = express.Router();
+var cors = require('cors');
 
+router.use(cors());
 var parametersFile = process.argv[2] || process.env['ADAL_SAMPLE_PARAMETERS_FILE'];
 
 var sampleParameters;
@@ -47,10 +49,6 @@ function createAuthorizationUrl(state) {
 }
 
 router.get('/', function(req, res) {
-  res.redirect('/loginplease');
-});
-
-router.get('/loginplease',function(req, res) {
   
   crypto.randomBytes(48, function(ex, buf) {
     var token = buf.toString('base64').replace(/\//g,'_').replace(/\+/g,'-');
