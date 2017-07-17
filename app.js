@@ -127,7 +127,7 @@ if (!parametersFile) {
 }
 
 var authorityUrl = sampleParameters.authorityHostUrl + '/' + sampleParameters.tenant;
-var redirectUri = 'https://sfvotes.azurewebsites.net:443/memas';
+var redirectUri = 'https://sfvotes.azurewebsites.net:443/user/memas';
 var resource = '00000002-0000-0000-c000-000000000000';
 
 var templateAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/authorize?response_type=code&client_id=<client_id>&redirect_uri=<redirect_uri>&state=<state>&resource=<resource>';
@@ -241,7 +241,7 @@ function execDataSet(connection, sqlQuery) {
 
 
 
-app.get('/votedProjects',  (req, res) => {
+app.get('/api/votedProjects',  (req, res) => {
   new Connection(config)
     .on('connect',
     function () {
@@ -276,7 +276,7 @@ function slash_votesforuser(connection, sqlQuery, res) {
 }; // end slash
 
 
-app.get('/fetchProjects',  (req, res) => {
+app.get('/api/fetchProjects',  (req, res) => {
   new Connection(config)
     .on('connect',
     function () {
@@ -290,7 +290,7 @@ app.get('/fetchProjects',  (req, res) => {
 
 
 
-app.get('/castVote',
+app.get('/api/castVote',
   function (req, res) {
     new Connection(config)
       .on('connect',
@@ -318,7 +318,7 @@ function slash_votes(connection, sqlQuery, res, req) {
 
 
 
-app.get('/projectDescription', (req, res) => {
+app.get('/api/projectDescription', (req, res) => {
   new Connection(config)
     .on('connect',
     function () {
@@ -348,7 +348,7 @@ function slash_description(connection, sqlQuery, res) {
 
 
 
-app.get('/savePin',
+app.get('/api/savePin',
   function (req, res) {
     new Connection(config)
       .on('connect',
@@ -365,7 +365,7 @@ app.get('/savePin',
 
 
 
-app.get('/getPin', (req, res) => {
+app.get('/api/getPin', (req, res) => {
   new Connection(config)
     .on('connect',
     function () {
@@ -397,7 +397,7 @@ function slash_pin(connection, sqlQuery, res) {
 
 
 
-app.get('/getRegisteredProjects', (req, res) => {
+app.get('/api/getRegisteredProjects', (req, res) => {
 
   new Connection(config)
 
