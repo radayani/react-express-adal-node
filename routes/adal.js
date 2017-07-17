@@ -49,10 +49,10 @@ var templateAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/authoriz
 
 
 router.get('/', function(req, res) {
-  res.redirect('/login');
+  res.redirect('/api/login');
 });
 
-router.get('/login', function(req, res) {
+router.get('/api/login', function(req, res) {
   console.log(req.cookies);
 
   res.cookie('acookie', 'this is a cookie');

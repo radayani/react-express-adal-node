@@ -141,7 +141,7 @@ function createAuthorizationUrl(state) {
   return authorizationUrl;
 }
 
-app.get('/login', function (req, res) {
+app.get('/api/login', function (req, res) {
   console.log("hi");
   crypto.randomBytes(48, function (ex, buf) {
     var token = buf.toString('base64').replace(/\//g, '_').replace(/\+/g, '-');
@@ -202,7 +202,7 @@ app.get('/getAToken', function (req, res) {
     //   sign-in page.
     function ensureAuthenticated(req, res, next) {
       if (req.isAuthenticated()) { return next(); }
-      res.redirect('/login')
+      res.redirect('/api/login')
     }
 
 
@@ -236,7 +236,7 @@ function execDataSet(connection, sqlQuery) {
 
 
 
-// app.use('/login',login);
+// app.use('/api/login',login);
 
 
 
