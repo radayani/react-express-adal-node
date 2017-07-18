@@ -127,7 +127,7 @@ if (!parametersFile) {
 }
 
 var authorityUrl = sampleParameters.authorityHostUrl + '/' + sampleParameters.tenant;
-var redirectUri = 'https://sfvotes.azurewebsites.net:443/user/memas';
+var redirectUri = 'https://sfvotes.azurewebsites.net/user/umkhande/register';
 var resource = '00000002-0000-0000-c000-000000000000';
 
 var templateAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/authorize?response_type=code&client_id=<client_id>&redirect_uri=<redirect_uri>&state=<state>&resource=<resource>';
@@ -170,7 +170,7 @@ app.get('/getAToken', function (req, res) {
     if (err) {
       // console.log(message);
       res.status(200);
-      res.redirect('/memas');
+      res.redirect('/umkhande');
       // res.send(message);
       return;
     }
@@ -181,9 +181,9 @@ app.get('/getAToken', function (req, res) {
         message += 'refreshError: ' + refreshErr.message + '\n';
       }
       message += 'refreshResponse: ' + JSON.stringify(refreshResponse);
-      
+
       res.status(200);
-      res.redirect('/memas');
+      res.redirect('/umkhande');
       // res.send(message);
     });
   });
@@ -196,14 +196,14 @@ app.get('/getAToken', function (req, res) {
 
 // Simple route middleware to ensure user is authenticated. (section 4)
 
-    //   Use this route middleware on any resource that needs to be protected. If
-    //   the request is authenticated (typically via a persistent sign-in session),
-    //   the request proceeds. Otherwise, the user is redirected to the
-    //   sign-in page.
-    function ensureAuthenticated(req, res, next) {
-      if (req.isAuthenticated()) { return next(); }
-      res.redirect('/api/login')
-    }
+//   Use this route middleware on any resource that needs to be protected. If
+//   the request is authenticated (typically via a persistent sign-in session),
+//   the request proceeds. Otherwise, the user is redirected to the
+//   sign-in page.
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) { return next(); }
+  res.redirect('/login')
+}
 
 
 
@@ -236,12 +236,12 @@ function execDataSet(connection, sqlQuery) {
 
 
 
-// app.use('/api/login',login);
+// app.use('/login',login);
 
 
 
 
-app.get('/api/votedProjects',  (req, res) => {
+app.get('/api/votedProjects', (req, res) => {
   new Connection(config)
     .on('connect',
     function () {
@@ -276,7 +276,7 @@ function slash_votesforuser(connection, sqlQuery, res) {
 }; // end slash
 
 
-app.get('/api/fetchProjects',  (req, res) => {
+app.get('/api/fetchProjects', (req, res) => {
   new Connection(config)
     .on('connect',
     function () {
@@ -288,7 +288,30 @@ app.get('/api/fetchProjects',  (req, res) => {
     });
 });
 
+app.get('/api/getMyUnRegProjects', (req, res) => {
+  new Connection(config)
+    .on('connect',
+    function () {
+      slash_votesforuser( //TODO:change function name
+        this,
+        "SELECT P.id,P.title AS name FROM Projects P INNER JOIN ProjectMembers PM ON P.id = PM.project_id LEFT OUTER JOIN Registration R ON P.id = R.project_id WHERE PM.alias like '%" + req.query.alias + "%' AND R.project_id IS NULL",//Todo: SQL Injection Fix
+        res
+      );
+    });
+});
 
+
+app.get('/api/fetchAllRegistrationProjects', (req, res) => {
+  new Connection(config)
+    .on('connect',
+    function () {
+      slash_votesforuser(
+        this,
+        "SELECT id,project_id FROM ProjectMembers WHERE alias like '%" + req.query.alias + "%'",//Todo: SQL Injection Fix
+        res
+      );
+    });
+});
 
 app.get('/api/castVote',
   function (req, res) {
@@ -412,9 +435,59 @@ app.get('/api/getRegisteredProjects', (req, res) => {
 });
 
 
+function execNonQueryNew(connection, sqlQuery, res) {
+  connection.execSql(
+    new Request(sqlQuery,
+      function (err, rowCount, rows) {
+        if (err) {
+          res.status(500).send({ status: 500 });
+        } else {
+          res.status(200).send({ status: 200 });
+        }
+        connection.close();
+      }
+    )
+  );
+};
+
+
+app.post('/projects/RegisterProjects',
+  function (req, res) {
+    var projects = req.body.projects;
+    var venue_id = req.body.venue_id;
+    console.log(projects);
+    //var sessionValue = req.session.authInfo;
+    //var authString = JSON.stringify(sessionValue);
+    var alias = req.body.alias;
+    console.log('registerprojects:' + alias);
+    var preSql = "INSERT INTO Registration (project_id,alias,venue_id) SELECT "
+    var sql = "";
+    if (Array.isArray(projects)) {
+      for (var i = 0; i < projects.length; i++) {
+        projects[i] = projects[i].replace(/^\s*/, "").replace(/\s*$/, "");
+        if (venue_id[i] != undefined) {
+          sql += preSql + projects[i] + ",'" + alias + "'," + venue_id[i] + " WHERE NOT EXISTS (SELECT * FROM Registration WHERE alias='" + req.body.alias + "' AND project_id=" + projects[i] + "); "
+        }
+      }
+    } else {
+      sql += preSql + projects + ",'" + alias + "'; "
+    }
+    console.log(sql);
+    new Connection(config)
+      .on('connect',
+      function () {
+        execNonQueryNew(
+          this,
+          sql,
+          res
+        );
+      });
+  });
+
+
 
 // app.use('/', index);
-app.use('/users', users);
+// app.use('/users', users);
 // app.use('/votedProjects', votedProjects);
 // app.use('/registeredProjects', registeredProjects);
 
