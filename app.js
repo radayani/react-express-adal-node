@@ -127,7 +127,7 @@ if (!parametersFile) {
 }
 
 var authorityUrl = sampleParameters.authorityHostUrl + '/' + sampleParameters.tenant;
-var redirectUri = 'https://sfvotes.azurewebsites.net/user/umkhande/register';
+var redirectUri = 'http://sfvotes.azurewebsites.net/user/umkhande/register';
 var resource = '00000002-0000-0000-c000-000000000000';
 
 var templateAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/authorize?response_type=code&client_id=<client_id>&redirect_uri=<redirect_uri>&state=<state>&resource=<resource>';
