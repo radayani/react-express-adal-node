@@ -171,7 +171,7 @@ app.get('/getAToken', function (req, res) {
     res.cookie('access_token', response.accessToken);
     res.cookie('alias', alias);
     if (err) {
-      res.redirect(`http://localhost:3001/user/${alias}/register`);
+      res.redirect(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
       return;
     }
 
@@ -181,7 +181,7 @@ app.get('/getAToken', function (req, res) {
         message += 'refreshError: ' + refreshErr.message + '\n';
       }
       message += 'refreshResponse: ' + JSON.stringify(refreshResponse);
-      res.redirect(`http://localhost:3001/user/${alias}/register`);
+      res.redirect(`http://sfvotes.azurewebsites.net/user/${alias}/register`);
     });
   }
   );
@@ -459,6 +459,12 @@ app.post('/api/registerProject',
     console.log(projects);
     //var sessionValue = req.session.authInfo;
     //var authString = JSON.stringify(sessionValue);
+    var sessionValue = req.session.authInfo;
+    console.log("sessionValue: " + sessionValue);
+    var authString = JSON.stringify(sessionValue);
+    console.log("authString: " + authString);
+    var userID = sessionValue.userId;
+    console.log("userID: " + userID);
     var alias = req.body.alias;
     console.log('registerprojects:' + alias);
     var sql = "INSERT INTO Registration (project_id,alias,venue_id) SELECT " + projects + " , '" + alias + "', '" + venue_id + "' WHERE NOT EXISTS (SELECT * FROM Registration WHERE alias='" + alias + "' AND project_id=" + projects + "); "
