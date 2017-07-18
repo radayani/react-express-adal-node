@@ -36,7 +36,6 @@ var config =
 
 // var login = require('./routes/login');
 var index = require('./routes/index');
-var users = require('./routes/users');
 // var votedProjects = require('./routes/votedProjects');
 var registeredProjects = require('./routes/registeredProjects');
 
@@ -127,7 +126,8 @@ if (!parametersFile) {
 }
 
 var authorityUrl = sampleParameters.authorityHostUrl + '/' + sampleParameters.tenant;
-var redirectUri = 'http://sfvotes.azurewebsites.net/user/umkhande/register';
+var redirectUri = 'http://sfvotes.azurewebsites.net/getAToken';
+// var redirectUri = 'http://localhost:3002/getAToken';
 var resource = '00000002-0000-0000-c000-000000000000';
 
 var templateAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/authorize?response_type=code&client_id=<client_id>&redirect_uri=<redirect_uri>&state=<state>&resource=<resource>';
@@ -161,17 +161,17 @@ app.get('/getAToken', function (req, res) {
   }
   var authenticationContext = new AuthenticationContext(authorityUrl);
   authenticationContext.acquireTokenWithAuthorizationCode(req.query.code, redirectUri, resource, sampleParameters.clientId, sampleParameters.clientSecret, function (err, response) {
+    var alias = response.userId.substring(0, response.userId.indexOf('@'));
     var message = '';
     if (err) {
       message = 'error: ' + err.message + '\n';
     }
     message += 'response: ' + JSON.stringify(response);
 
+    res.cookie('access_token', response.accessToken);
+    res.cookie('alias', alias);
     if (err) {
-      // console.log(message);
-      res.status(200);
-      res.redirect('/umkhande');
-      // res.send(message);
+      res.redirect(`http://localhost:3001/user/${alias}/register`);
       return;
     }
 
@@ -181,16 +181,11 @@ app.get('/getAToken', function (req, res) {
         message += 'refreshError: ' + refreshErr.message + '\n';
       }
       message += 'refreshResponse: ' + JSON.stringify(refreshResponse);
-
-      res.status(200);
-      res.redirect('/umkhande');
-      // res.send(message);
+      res.redirect(`http://localhost:3001/user/${alias}/register`);
     });
-  });
+  }
+  );
 });
-
-
-
 
 
 
@@ -200,12 +195,13 @@ app.get('/getAToken', function (req, res) {
 //   the request is authenticated (typically via a persistent sign-in session),
 //   the request proceeds. Otherwise, the user is redirected to the
 //   sign-in page.
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) { return next(); }
-  res.redirect('/login')
-}
-
-
+// function ensureAuthenticated(req, res, next) {
+//   console.log(app.get('access_token'));
+//   // if (req.isAuthenticated()) { return next(); }
+//   // res.redirect('/login')
+//   if(app.get('access_token'))
+//     return next();
+// }
 
 
 
@@ -441,7 +437,11 @@ function execNonQueryNew(connection, sqlQuery, res) {
       function (err, rowCount, rows) {
         if (err) {
           res.status(500).send({ status: 500 });
-        } else {
+        }
+        else if (sqlQuery == null) {
+          res.status(500).send({ status: 500 });
+        }
+        else {
           res.status(200).send({ status: 200 });
         }
         connection.close();
@@ -451,8 +451,9 @@ function execNonQueryNew(connection, sqlQuery, res) {
 };
 
 
-app.post('/projects/RegisterProjects',
+app.post('/api/registerProject',
   function (req, res) {
+    console.log(req.body);
     var projects = req.body.projects;
     var venue_id = req.body.venue_id;
     console.log(projects);
@@ -460,19 +461,7 @@ app.post('/projects/RegisterProjects',
     //var authString = JSON.stringify(sessionValue);
     var alias = req.body.alias;
     console.log('registerprojects:' + alias);
-    var preSql = "INSERT INTO Registration (project_id,alias,venue_id) SELECT "
-    var sql = "";
-    if (Array.isArray(projects)) {
-      for (var i = 0; i < projects.length; i++) {
-        projects[i] = projects[i].replace(/^\s*/, "").replace(/\s*$/, "");
-        if (venue_id[i] != undefined) {
-          sql += preSql + projects[i] + ",'" + alias + "'," + venue_id[i] + " WHERE NOT EXISTS (SELECT * FROM Registration WHERE alias='" + req.body.alias + "' AND project_id=" + projects[i] + "); "
-        }
-      }
-    } else {
-      sql += preSql + projects + ",'" + alias + "'; "
-    }
-    console.log(sql);
+    var sql = "INSERT INTO Registration (project_id,alias,venue_id) SELECT " + projects + " , '" + alias + "', '" + venue_id + "' WHERE NOT EXISTS (SELECT * FROM Registration WHERE alias='" + alias + "' AND project_id=" + projects + "); "
     new Connection(config)
       .on('connect',
       function () {
@@ -493,7 +482,7 @@ app.post('/projects/RegisterProjects',
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  var err = req; //new Error('Not Found');
+  var err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
@@ -508,6 +497,6 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-app.listen(3000, () => { console.log('Server started on port 3002') });
+app.listen(3000, () => { console.log('Server started on port 3000') });
 module.exports = app;
 
