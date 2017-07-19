@@ -131,7 +131,7 @@ if (!parametersFile) {
 }
 
 var authorityUrl = sampleParameters.authorityHostUrl + '/' + sampleParameters.tenant;
-var redirectUri = 'http://localhost:3002/getAToken';
+var redirectUri = 'http://sfvotes.azurewebsites.net/getAToken';
 // var redirectUri = 'http://localhost:3002/getAToken';
 var resource = '00000002-0000-0000-c000-000000000000';
 
@@ -493,7 +493,7 @@ app.post('/api/registerProject',
 // // app.use('/', index);
 // // app.use('/users', users);
 app.use('/api/votedProjects', votedProjects);
-app.use('/api/getregisteredProjects', registeredProjects);
+app.use('/api/getRegisteredProjects', registeredProjects);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
