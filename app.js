@@ -190,8 +190,9 @@ app.get('/getAToken', function (req, res) {
       }
       message += 'refreshResponse: ' + JSON.stringify(refreshResponse);
       // window.location.replace(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
+      res.redirect(`/user/radayani/register`);
       
-      res.redirect(`/api/votedProjects`);
+      // res.redirect(`/api/votedProjects`);
     });
   }
   );
