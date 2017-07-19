@@ -180,9 +180,9 @@ app.get('/getAToken', function (req, res) {
     res.cookie('alias', alias);
     if (err) {
       // window.location.replace(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
-      res.redirect(`/user/${alias}/register`);
+      // res.redirect(`/user/${alias}/register`);
       // res.redirect(`/loggedIn/2`);
-      
+      res.sendFile(__dirname + '/public/index.html')
       // res.redirect(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
       return;
     }
@@ -194,17 +194,17 @@ app.get('/getAToken', function (req, res) {
       }
       message += 'refreshResponse: ' + JSON.stringify(refreshResponse);
       // window.location.replace(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
-      res.redirect(`/user/${alias}/register`);
-      
+      // res.redirect(`/user/${alias}/register`);
+      res.sendFile(__dirname + '/public/index.html')
       // res.redirect(`/loggedIn/1`);
     });
   }
   );
 });
 
-app.get(`/user/${alias}/register`, function(req, res) {
-  res.sendFile(__dirname + '/public/index.html')
-});
+// app.get(`/user/${alias}/register`, function(req, res) {
+//   res.sendFile(__dirname + '/public/index.html')
+// });
 
 // app.get('http://sfvotes.azurewebsites.net/getAToken?code=:x',function(req,res){
 // res.redirect(`/user/${alias}/register`);
