@@ -201,7 +201,7 @@ app.get('/getAToken', function (req, res) {
 });
 
 // app.get(`/user/${alias}/register`, function(req, res) {
-app.get(`/${radayani}`, function(req, res) {
+app.get(`/${alias}`, function(req, res) {
   res.sendFile(__dirname + '/public/index.html')
 });
 
