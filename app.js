@@ -162,14 +162,14 @@ app.get('/api/login', function (req, res) {
 });
 
 
-
+var alias=null;
 app.get('/getAToken', function (req, res) {
   if (req.cookies.authstate !== req.query.state) {
     res.send('error: state does not match');
   }
   var authenticationContext = new AuthenticationContext(authorityUrl);
   authenticationContext.acquireTokenWithAuthorizationCode(req.query.code, redirectUri, resource, sampleParameters.clientId, sampleParameters.clientSecret, function (err, response) {
-    var alias = response.userId.substring(0, response.userId.indexOf('@'));
+    alias = response.userId.substring(0, response.userId.indexOf('@'));
     var message = '';
     if (err) {
       message = 'error: ' + err.message + '\n';
@@ -180,8 +180,8 @@ app.get('/getAToken', function (req, res) {
     res.cookie('alias', alias);
     if (err) {
       // window.location.replace(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
-      // res.redirect(`/user/radayani/register`);
-      res.redirect(`/loggedIn`);
+      res.redirect(`/user/${alias}/register`);
+      // res.redirect(`/loggedIn/2`);
       
       // res.redirect(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
       return;
@@ -194,15 +194,15 @@ app.get('/getAToken', function (req, res) {
       }
       message += 'refreshResponse: ' + JSON.stringify(refreshResponse);
       // window.location.replace(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
-      // res.redirect(`/user/radayani/register`);
+      res.redirect(`/user/${alias}/register`);
       
-      res.redirect(`/loggedIn`);
+      // res.redirect(`/loggedIn/1`);
     });
   }
   );
 });
 
-app.get(`/loggedIn`, function(req, res) {
+app.get(`/user/${alias}/register`, function(req, res) {
   res.sendFile(__dirname + '/public/index.html')
 });
 
