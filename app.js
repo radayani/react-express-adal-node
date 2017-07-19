@@ -67,6 +67,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 // app.use(serveStatic('D:\home\site\wwwroot\public' ));
+app.get('/', function(req, res){
+  res.redirect('/user');
+});
 app.use(cors());
 
 
@@ -198,11 +201,13 @@ app.get('/getAToken', function (req, res) {
   );
 });
 
+app.get('*', function(req, res) {
+  res.sendFile(__dirname + '/public/index.html')
+});
 
-
-app.get('http://sfvotes.azurewebsites.net/getAToken?code=:x',function(req,res){
-res.redirect(`/user`);
-}) 
+// app.get('http://sfvotes.azurewebsites.net/getAToken?code=:x',function(req,res){
+// res.redirect(`/user`);
+// }) 
  
 
 
@@ -521,6 +526,6 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-app.listen(3002, () => { console.log('Server started on port 3000') });
+app.listen(3000, () => { console.log('Server started on port 3000') });
 module.exports = app;
 
