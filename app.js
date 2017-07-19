@@ -177,7 +177,7 @@ app.get('/getAToken', function (req, res) {
     res.cookie('alias', alias);
     if (err) {
       // window.location.replace(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
-      res.redirect(`/api/votedProjects`);
+      res.redirect(`/user/radayani/register`);
       
       // res.redirect(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
       return;
