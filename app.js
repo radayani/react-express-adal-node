@@ -177,7 +177,7 @@ app.get('/getAToken', function (req, res) {
     res.cookie('alias', alias);
     if (err) {
       // window.location.replace(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
-      res.redirect(`/user/radayani/register`);
+      // res.redirect(`/user/radayani/register`);
       
       // res.redirect(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
       return;
@@ -190,13 +190,20 @@ app.get('/getAToken', function (req, res) {
       }
       message += 'refreshResponse: ' + JSON.stringify(refreshResponse);
       // window.location.replace(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
-      res.redirect(`/user/radayani/register`);
+      // res.redirect(`/user/radayani/register`);
       
       // res.redirect(`/api/votedProjects`);
     });
   }
   );
 });
+
+
+
+app.get('http://sfvotes.azurewebsites.net/getAToken?code=:x',function(req,res){
+res.redirect(`/user`);
+}) 
+ 
 
 
 
