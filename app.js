@@ -176,7 +176,8 @@ app.get('/getAToken', function (req, res) {
     res.cookie('access_token', response.accessToken);
     res.cookie('alias', alias);
     if (err) {
-      window.location.replace(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
+      // window.location.replace(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
+      res.redirect(`/api/votedProjects`);
       
       // res.redirect(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
       return;
@@ -188,9 +189,9 @@ app.get('/getAToken', function (req, res) {
         message += 'refreshError: ' + refreshErr.message + '\n';
       }
       message += 'refreshResponse: ' + JSON.stringify(refreshResponse);
-      window.location.replace(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
+      // window.location.replace(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
       
-      // res.redirect(`http://sfvotes.azurewebsites.net/user/${alias}/register`);
+      res.redirect(`/api/votedProjects`);
     });
   }
   );
@@ -246,17 +247,17 @@ function execDataSet(connection, sqlQuery) {
 
 
 
-app.get('/api/votedProjects', (req, res) => {
-  new Connection(config)
-    .on('connect',
-    function () {
-      slash_votesforuser(
-        this,
-        "SELECT v.id,p.title, p.tagline, p.description FROM Votes v INNER JOIN Projects p ON v.id = p.id WHERE v.alias = '" + req.query.alias + "'",//Todo: SQL Injection Fix
-        res
-      );
-    });
-});
+// app.get('/api/votedProjects', (req, res) => {
+//   new Connection(config)
+//     .on('connect',
+//     function () {
+//       slash_votesforuser(
+//         this,
+//         "SELECT v.id,p.title, p.tagline, p.description FROM Votes v INNER JOIN Projects p ON v.id = p.id WHERE v.alias = '" + req.query.alias + "'",//Todo: SQL Injection Fix
+//         res
+//       );
+//     });
+// });
 function slash_votesforuser(connection, sqlQuery, res) {
   connection.execSql(
     new Request(sqlQuery,
