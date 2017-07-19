@@ -68,7 +68,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 // app.use(serveStatic('D:\home\site\wwwroot\public' ));
 app.get('/', function (req, res) {
-  res.redirect('/user');
+  // res.redirect('/user');
+  res.sendFile(__dirname + '/public/index.html')
+  
 });
 app.use(cors());
 
