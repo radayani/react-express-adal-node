@@ -181,9 +181,8 @@ app.get('/getAToken', function (req, res) {
     if (err) {
       // window.location.replace(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
       // res.redirect(`/user/${alias}/register`);
-      // res.redirect(`/loggedIn/2`);
-      res.sendFile(__dirname + '/public/index.html')
-      // res.redirect(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
+      res.redirect(`/loggedIn`);
+      // res.sendFile(__dirname + '/public/index.html');
       return;
     }
 
@@ -193,23 +192,23 @@ app.get('/getAToken', function (req, res) {
         message += 'refreshError: ' + refreshErr.message + '\n';
       }
       message += 'refreshResponse: ' + JSON.stringify(refreshResponse);
-      // window.location.replace(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
       // res.redirect(`/user/${alias}/register`);
-      res.sendFile(__dirname + '/public/index.html')
-      // res.redirect(`/loggedIn/1`);
+      // res.sendFile(__dirname + '/public/index.html');
+      res.redirect(`/loggedIn`);
     });
   }
   );
 });
 
 // app.get(`/user/${alias}/register`, function(req, res) {
-//   res.sendFile(__dirname + '/public/index.html')
-// });
+app.get(`/loggedIn`, function(req, res) {
+  res.sendFile(__dirname + '/public/index.html')
+});
 
 // app.get('http://sfvotes.azurewebsites.net/getAToken?code=:x',function(req,res){
 // res.redirect(`/user/${alias}/register`);
-// }) 
- 
+// })
+
 
 
 
@@ -385,7 +384,7 @@ function slash_description(connection, sqlQuery, res) {
 
       })
   ); // end execSql
-}; // end slash 
+}; // end slash
 
 
 
