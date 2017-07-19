@@ -181,7 +181,7 @@ app.get('/getAToken', function (req, res) {
     if (err) {
       // window.location.replace(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
       // res.redirect(`/user/${alias}/register`);
-      res.redirect(`/${alias}`);
+      res.redirect(`/home`);
       // res.sendFile(__dirname + '/public/index.html');
       return;
     }
@@ -194,14 +194,14 @@ app.get('/getAToken', function (req, res) {
       message += 'refreshResponse: ' + JSON.stringify(refreshResponse);
       // res.redirect(`/user/${alias}/register`);
       // res.sendFile(__dirname + '/public/index.html');
-      res.redirect(`/${alias}`);
+      res.redirect(`/home`);
     });
   }
   );
 });
 
 // app.get(`/user/${alias}/register`, function(req, res) {
-app.get(`/${alias}`, function(req, res) {
+app.get(`/home`, function(req, res) {
   res.sendFile(__dirname + '/public/index.html')
 });
 
