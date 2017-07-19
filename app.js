@@ -3,7 +3,7 @@ var express = require('express');
 var fs = require('fs');
 var crypto = require('crypto');
 var AuthenticationContext = require('adal-node').AuthenticationContext;
-
+// var router = require('react-router-dom');
 
 var path = require('path');
 var bodyParser = require('body-parser');
@@ -37,11 +37,14 @@ var config =
 
 // var login = require('./routes/login');
 var index = require('./routes/index');
-// var votedProjects = require('./routes/votedProjects');
+var votedProjects = require('./routes/votedProjects');
 var registeredProjects = require('./routes/registeredProjects');
 
 
 var app = express();
+var router = express.Router();
+
+router.use(cors());
 
 // server side view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -128,7 +131,7 @@ if (!parametersFile) {
 }
 
 var authorityUrl = sampleParameters.authorityHostUrl + '/' + sampleParameters.tenant;
-var redirectUri = 'http://sfvotes.azurewebsites.net/getAToken';
+var redirectUri = 'http://localhost:3002/getAToken';
 // var redirectUri = 'http://localhost:3002/getAToken';
 var resource = '00000002-0000-0000-c000-000000000000';
 
@@ -173,7 +176,9 @@ app.get('/getAToken', function (req, res) {
     res.cookie('access_token', response.accessToken);
     res.cookie('alias', alias);
     if (err) {
-      res.redirect(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
+      window.location.replace(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
+      
+      // res.redirect(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
       return;
     }
 
@@ -183,7 +188,9 @@ app.get('/getAToken', function (req, res) {
         message += 'refreshError: ' + refreshErr.message + '\n';
       }
       message += 'refreshResponse: ' + JSON.stringify(refreshResponse);
-      res.redirect(`http://sfvotes.azurewebsites.net/user/${alias}/register`);
+      window.location.replace(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
+      
+      // res.redirect(`http://sfvotes.azurewebsites.net/user/${alias}/register`);
     });
   }
   );
@@ -418,19 +425,19 @@ function slash_pin(connection, sqlQuery, res) {
 
 
 
-app.get('/api/getRegisteredProjects', (req, res) => {
+// app.get('/api/getRegisteredProjects', (req, res) => {
 
-  new Connection(config)
+//   new Connection(config)
 
-    .on('connect',
-    function () {
-      slash_votesforuser(
-        this,
-        "SELECT r.project_id, p.title, p.tagline, p.description FROM Registration r INNER JOIN Projects p ON r.Project_id =p.id WHERE r.alias like '%" + req.query.alias + "%'",//Todo: SQL Injection Fix
-        res
-      );
-    });
-});
+//     .on('connect',
+//     function () {
+//       slash_votesforuser(
+//         this,
+//         "SELECT r.project_id, p.title, p.tagline, p.description FROM Registration r INNER JOIN Projects p ON r.Project_id =p.id WHERE r.alias like '%" + req.query.alias + "%'",//Todo: SQL Injection Fix
+//         res
+//       );
+//     });
+// });
 
 
 function execNonQueryNew(connection, sqlQuery, res) {
@@ -483,10 +490,10 @@ app.post('/api/registerProject',
 
 
 
-// app.use('/', index);
-// app.use('/users', users);
-// app.use('/votedProjects', votedProjects);
-// app.use('/registeredProjects', registeredProjects);
+// // app.use('/', index);
+// // app.use('/users', users);
+app.use('/api/votedProjects', votedProjects);
+app.use('/api/getregisteredProjects', registeredProjects);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -505,6 +512,6 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-app.listen(3000, () => { console.log('Server started on port 3000') });
+app.listen(3002, () => { console.log('Server started on port 3000') });
 module.exports = app;
 
