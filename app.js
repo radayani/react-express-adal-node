@@ -477,7 +477,7 @@ app.get('/api/getPin', (req, res) => {
     console.log("RES: " + res);
       localStorage.setItem('myPin', res);
       res.cookie('myPIN', res);
-      req.session(res);
+      console.log(req.session);
        res.sendFile(__dirname + '/public/index.html')
 });
 function slash_pin(connection, sqlQuery, res) {
