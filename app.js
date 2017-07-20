@@ -202,7 +202,7 @@ app.get('/getAToken', function (req, res) {
 
 // app.get(`/user/${alias}/register`, function(req, res) {
 app.get(`/home`, function (req, res) {
-  res.redirect('/api/getPin');
+  res.redirect(`/api/getPin?alias=${alias}`);
   // res.redirect("http://localhost:3001/home");
   res.sendFile(__dirname + '/public/index.html')
 });
@@ -477,6 +477,7 @@ app.get('/api/getPin', (req, res) => {
     console.log("RES: " + res);
       localStorage.setItem('myPin', res);
       res.cookie('myPIN', res);
+      req.session(res);
        res.sendFile(__dirname + '/public/index.html')
 });
 function slash_pin(connection, sqlQuery, res) {
