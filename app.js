@@ -208,7 +208,11 @@ app.get(`/home`, function (req, res) {
 });
 
 
-var logoutAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=http://sfvotes.websites.net/';
+var logoutAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=http://sfvotes.websites.net/loginAgain';
+
+app.get('/api/loginAgain', function(req,res){
+    res.redirect('/api/login');
+});
 
 // var logoutAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=http://localhost:3002/api/login';
 
