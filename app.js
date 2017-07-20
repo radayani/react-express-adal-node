@@ -181,7 +181,7 @@ app.get('/getAToken', function (req, res) {
     if (err) {
       // window.location.replace(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
       // res.redirect(`/user/${alias}/register`);
-      res.redirect(`/home`);
+      res.redirect(`/api/getPin?alias=${alias}`);
       // res.sendFile(__dirname + '/public/index.html');
       return;
     }
@@ -194,7 +194,7 @@ app.get('/getAToken', function (req, res) {
       message += 'refreshResponse: ' + JSON.stringify(refreshResponse);
       // res.redirect(`/user/${alias}/register`);
       // res.sendFile(__dirname + '/public/index.html');
-      res.redirect(`/home`);
+      res.redirect(`/api/getPin?alias=${alias}`);
     });
   }
   );
@@ -202,7 +202,7 @@ app.get('/getAToken', function (req, res) {
 
 // app.get(`/user/${alias}/register`, function(req, res) {
 app.get(`/home`, function (req, res) {
-  res.redirect(`/api/getPin?alias=${alias}`);
+  // res.redirect(`/api/getPin?alias=${alias}`);
   // res.redirect("http://localhost:3001/home");
   res.sendFile(__dirname + '/public/index.html')
 });
@@ -474,26 +474,27 @@ app.get('/api/getPin', (req, res) => {
       );
       
     });
-    console.log("RES: " + res);
-      localStorage.setItem('myPin', res);
-      res.cookie('myPIN', res);
-      console.log(req.session);
-       res.sendFile(__dirname + '/public/index.html')
+    // console.log("RES: " + res);
+    //   localStorage.setItem('myPin', res);
+    //   res.cookie('myPIN', res);
+    //   console.log(req.session);
+    //    res.sendFile(__dirname + '/public/index.html')
 });
 function slash_pin(connection, sqlQuery, res) {
   connection.execSql(
     new Request(sqlQuery,
       function (err, rowCount, rows) {
         var item = "";
-        {
-          if (rows[0] == undefined) {
-            res.status(400).send("Pin Not Found");
-          }
-          else {
+        // {
+          // if (rows[0] == undefined) {
+          //   res.status(400).send("Pin Not Found");
+          // }
+          // else {
             item = rows[0][0].value.toString();
-          }
-        }
+          // }
+        // }
         res.json(item);
+        res.cookie('myPIN', item);
         connection.close();
       })
   ); // end execSql
