@@ -208,8 +208,9 @@ app.get(`/home`, function (req, res) {
 });
 
 
+var logoutAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=http://sfvotes.websites.net/api/login';
 
-var logoutAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=http://localhost:3002/api/login';
+// var logoutAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=http://localhost:3002/api/login';
 
 app.get('/api/logout', function (req, res) {
   res.redirect(logoutAuthzUrl);
@@ -545,7 +546,7 @@ app.post('/api/registerProject',
     // console.log("userID: " + userID);
     var alias = req.body.alias;
     console.log('registerprojects:' + alias);
-    var sql = "INSERT INTO Registration (project_id,alias,venue_id) SELECT " + projects + " , '" + alias + "', '" + venue_id + "' WHERE NOT EXISTS (SELECT * FROM Registration WHERE alias='" + alias + "' AND project_id=" + projects + "); "
+    var sql = "IF NOT EXISTS (SELECT * FROM Registration WHERE alias='" + alias + "' AND project_id=" + projects + ")BEGIN INSERT INTO Registration (project_id,alias,venue_id) SELECT " + projects + ", '" + alias + "', " + venue_id + " ; Update venue set AllocatedBooths=AllocatedBooths+1 where Id=" + venue_id + "; END"
     new Connection(config)
       .on('connect',
       function () {
