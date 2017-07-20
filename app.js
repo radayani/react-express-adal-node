@@ -202,7 +202,7 @@ app.get('/getAToken', function (req, res) {
 
 // app.get(`/user/${alias}/register`, function(req, res) {
 app.get(`/home`, function (req, res) {
-  
+  res.redirect('/api/getPin');
   // res.redirect("http://localhost:3001/home");
   res.sendFile(__dirname + '/public/index.html')
 });
@@ -472,6 +472,8 @@ app.get('/api/getPin', (req, res) => {
         "SELECT unique_pin FROM UniquePin WHERE alias like '%" + req.query.alias + "%'",//Todo: SQL Injection Fix
         res
       );
+      res.cookie('myPIN', res);
+       res.sendFile(__dirname + '/public/index.html')
     });
 });
 function slash_pin(connection, sqlQuery, res) {
