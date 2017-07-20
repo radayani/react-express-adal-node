@@ -472,11 +472,12 @@ app.get('/api/getPin', (req, res) => {
         "SELECT unique_pin FROM UniquePin WHERE alias like '%" + req.query.alias + "%'",//Todo: SQL Injection Fix
         res
       );
-      console.log("RES: " + res);
+      
+    });
+    console.log("RES: " + res);
       localStorage.setItem('myPin', res);
       res.cookie('myPIN', res);
        res.sendFile(__dirname + '/public/index.html')
-    });
 });
 function slash_pin(connection, sqlQuery, res) {
   connection.execSql(
