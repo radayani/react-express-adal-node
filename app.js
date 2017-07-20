@@ -38,7 +38,7 @@ var config =
 // var login = require('./routes/login');
 var index = require('./routes/index');
 var votedProjects = require('./routes/votedProjects');
-var registeredProjects = require('./routes/registeredProjects');
+// var registeredProjects = require('./routes/registeredProjects');
 
 
 var app = express();
@@ -134,8 +134,8 @@ if (!parametersFile) {
 }
 
 var authorityUrl = sampleParameters.authorityHostUrl + '/' + sampleParameters.tenant;
-var redirectUri = 'http://sfvotes.azurewebsites.net/getAToken';
-// var redirectUri = 'http://localhost:3002/getAToken';
+ var redirectUri = 'http://sfvotes.azurewebsites.net/getAToken';
+// var redirectUri = 'http://localhost:3000/getAToken';
 var resource = '00000002-0000-0000-c000-000000000000';
 
 var templateAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/authorize?response_type=code&client_id=<client_id>&redirect_uri=<redirect_uri>&state=<state>&resource=<resource>';
@@ -162,7 +162,7 @@ app.get('/api/login', function (req, res) {
 });
 
 
-var alias=null;
+var alias = null;
 app.get('/getAToken', function (req, res) {
   if (req.cookies.authstate !== req.query.state) {
     res.send('error: state does not match');
@@ -201,15 +201,47 @@ app.get('/getAToken', function (req, res) {
 });
 
 // app.get(`/user/${alias}/register`, function(req, res) {
-app.get(`/home`, function(req, res) {
+app.get(`/home`, function (req, res) {
+  
+  // res.redirect("http://localhost:3001/home");
   res.sendFile(__dirname + '/public/index.html')
 });
 
+
+
+var logoutAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=http://localhost:3002/api/login';
+
+app.get('/api/logout', function (req, res) {
+  res.redirect(logoutAuthzUrl);
+  // });
+});
 // app.get('http://sfvotes.azurewebsites.net/getAToken?code=:x',function(req,res){
 // res.redirect(`/user/${alias}/register`);
 // })
 
+app.get('/api/getAvailableVenue', (req, res) => {
+  new Connection(config)
+    .on('connect',
+    function () {
+      slash_votesforuser(
+        this,
+        "SELECT distinct venue, MIN(id) as id FROM venue GROUP BY venue",//Todo: SQL Injection Fix
+        res
+      );
+    });
+});
 
+app.get('/api/getAvailableLocation', (req, res) => {
+  new Connection(config)
+    .on('connect',
+    function () {
+      slash_votesforuser(
+        this,
+        "SELECT id,venue, Location FROM venue WHERE AllowedBooths>AllocatedBooths and venue like '%" + req.query.venue + "%'", //Todo: SQL Injection Fix
+        res
+      );
+    });
+});
 
 
 // Simple route middleware to ensure user is authenticated. (section 4)
@@ -390,19 +422,38 @@ function slash_description(connection, sqlQuery, res) {
 
 
 
-app.get('/api/savePin',
+app.post('/api/savePin',
   function (req, res) {
+    var alias = req.body.alias;
+    var uniquePin = req.body.unique_pin;
+    if (uniquePin != undefined && alias != undefined) {
+      var sql = "INSERT INTO UniquePin (alias,unique_pin) SELECT '" + alias + "','" + uniquePin + "'  WHERE NOT EXISTS (SELECT * FROM UniquePin WHERE alias='" + alias + "')";
+    }
     new Connection(config)
       .on('connect',
       function () {
-        slash_votes(
+        execNonQueryNew(
           this,
-          "INSERT INTO UniquePin (alias,unique_pin) SELECT '" + req.query.alias + "','" + req.query.UniquePin + "'  WHERE NOT EXISTS (SELECT * FROM UniquePin WHERE alias='" + req.query.alias + "')",//Todo: SQL Injection Fix
-          res,
-          req
+          sql,
+          res
         );
       });
   });
+
+
+// app.get('/api/savePin',
+//   function (req, res) {
+//     new Connection(config)
+//       .on('connect',
+//       function () {
+//         slash_votes(
+//           this,
+//           "INSERT INTO UniquePin (alias,unique_pin) SELECT '" + req.query.alias + "','" + req.query.UniquePin + "'  WHERE NOT EXISTS (SELECT * FROM UniquePin WHERE alias='" + req.query.alias + "')",//Todo: SQL Injection Fix
+//           res,
+//           req
+//         );
+//       });
+//   });
 
 
 
@@ -439,19 +490,23 @@ function slash_pin(connection, sqlQuery, res) {
 
 
 
-// app.get('/api/getRegisteredProjects', (req, res) => {
 
-//   new Connection(config)
 
-//     .on('connect',
-//     function () {
-//       slash_votesforuser(
-//         this,
-//         "SELECT r.project_id, p.title, p.tagline, p.description FROM Registration r INNER JOIN Projects p ON r.Project_id =p.id WHERE r.alias like '%" + req.query.alias + "%'",//Todo: SQL Injection Fix
-//         res
-//       );
-//     });
-// });
+app.get('/api/getRegisteredProjects', (req, res) => {
+
+  new Connection(config)
+
+    .on('connect',
+    function () {
+      slash_votesforuser(
+        this,
+        "select pm.project_id, p.title,p.description,v.venue ,v.Location from ProjectMembers pm INNER JOIN Projects p on p.id=pm.project_id INNER JOIN Registration r on pm.project_id=r.project_id INNER JOIN venue v on r.venue_id = v.id where pm.alias like '%"  +  req.query.alias  +  "%'",
+        // "SELECT r.project_id, p.title, p.tagline, p.description, v.venue ,v.Location FROM Registration r INNER JOIN Projects p ON r.Project_id =p.id INNER JOIN Venue v on r.venue_id = v.id WHERE r.alias like '%" + req.query.alias + "%' ",
+        // "SELECT r.project_id, p.title, p.tagline, p.description FROM Registration r INNER JOIN Projects p ON r.Project_id =p.id WHERE r.alias like '%" + req.query.alias + "%'",//Todo: SQL Injection Fix
+        res
+      );
+    });
+});
 
 
 function execNonQueryNew(connection, sqlQuery, res) {
@@ -482,12 +537,12 @@ app.post('/api/registerProject',
     console.log(projects);
     //var sessionValue = req.session.authInfo;
     //var authString = JSON.stringify(sessionValue);
-    var sessionValue = req.session.authInfo;
-    console.log("sessionValue: " + sessionValue);
-    var authString = JSON.stringify(sessionValue);
-    console.log("authString: " + authString);
-    var userID = sessionValue.userId;
-    console.log("userID: " + userID);
+    // var sessionValue = req.session.authInfo;
+    // console.log("sessionValue: " + sessionValue);
+    // var authString = JSON.stringify(sessionValue);
+    // console.log("authString: " + authString);
+    // var userID = sessionValue.userId;
+    // console.log("userID: " + userID);
     var alias = req.body.alias;
     console.log('registerprojects:' + alias);
     var sql = "INSERT INTO Registration (project_id,alias,venue_id) SELECT " + projects + " , '" + alias + "', '" + venue_id + "' WHERE NOT EXISTS (SELECT * FROM Registration WHERE alias='" + alias + "' AND project_id=" + projects + "); "
@@ -507,7 +562,7 @@ app.post('/api/registerProject',
 // // app.use('/', index);
 // // app.use('/users', users);
 app.use('/api/votedProjects', votedProjects);
-app.use('/api/getRegisteredProjects', registeredProjects);
+// app.use('/api/getRegisteredProjects', registeredProjects);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
