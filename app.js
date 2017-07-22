@@ -37,7 +37,7 @@ var config =
 
 // var login = require('./routes/login');
 var index = require('./routes/index');
-var votedProjects = require('./routes/votedProjects');
+// var votedProjects = require('./routes/votedProjects');
 // var registeredProjects = require('./routes/registeredProjects');
 
 
