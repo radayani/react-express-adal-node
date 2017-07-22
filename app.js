@@ -471,16 +471,15 @@ app.post('/api/savePin',
 
 
 app.get('/api/getPin', (req, res) => {
-  new Connection(config)
-    .on('connect',
-    function () {
-      slash_pin(
-        this,
-        "SELECT unique_pin FROM UniquePin WHERE alias like '%" + req.query.alias + "%'",//Todo: SQL Injection Fix
-        res
-      );
-
-    });
+  new Connection(config).on('connect', function () {
+    console.log("hello");
+    slash_pin(
+      this,
+      "SELECT unique_pin FROM UniquePin WHERE alias like '%" + req.query.alias + "%'",//Todo: SQL Injection Fix
+      res
+    );
+    console.log("bye" + res);
+  });
   // console.log("RES: " + res);
   //   localStorage.setItem('myPin', res);
   //   res.cookie('myPIN', res);
@@ -488,32 +487,40 @@ app.get('/api/getPin', (req, res) => {
   //    res.sendFile(__dirname + '/public/index.html')
 });
 function slash_pin(connection, sqlQuery, res) {
+  console.log("entered slash_pin");
+
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
-        var item = "";
-        {
-          if (rows[0] == undefined) {
-            console.log(item + " row[0]: " + row[0]);
-            res.status(400);
-            res.redirect(`/home`);
-            
-          }
-          else {
-            console.log("else row[0]: " + row[0]);
-            
-            item = rows[0][0].value.toString();
-            console.log(" else item: " + item );
-            
-            res.cookie('myPIN', item);
-            res.status(200);
-            
-            res.redirect(`/home/${res.cookies.myPIN}`);
+    console.log("entered execsql ");
 
-          }
-        }
-        // res.json(item);
+    var item = "";
+    console.log("before this ");
 
-        connection.close();
-      })
+    {
+      console.log("aftr this");
+
+      if (rows[0] == undefined) {
+        console.log(item + " row[0]: " + row[0]);
+        res.status(400);
+        res.redirect(`/home`);
+
+      }
+      else {
+        console.log("else row[0]: " + row[0]);
+
+        item = rows[0][0].value.toString();
+        console.log(" else item: " + item);
+
+        res.cookie('myPIN', item);
+        res.status(200);
+
+        res.redirect(`/home/${res.cookies.myPIN}`);
+
+      }
+    }
+    // res.json(item);
+
+    connection.close();
+  })
   ); // end execSql
 };
 
