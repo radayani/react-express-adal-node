@@ -202,16 +202,18 @@ app.get('/getAToken', function (req, res) {
 
 // app.get(`/user/${alias}/register`, function(req, res) {
 app.get(`/home/:myPin`, function (req, res) {
+  console.log("/home/mypin url me enter kiya");
   // res.redirect(`/api/getPin?alias=${alias}`);
   // res.redirect("http://localhost:3001/home");
-  res.sendFile(__dirname + '/public/index.html')
+  res.sendFile(__dirname + '/public/index.html');
 });
 
 // app.get(`/user/${alias}/register`, function(req, res) {
 app.get(`/home`, function (req, res) {
+  console.log("/home url me enter kiya");
   // res.redirect(`/api/getPin?alias=${alias}`);
   // res.redirect("http://localhost:3001/home");
-  res.sendFile(__dirname + '/public/index.html')
+  res.sendFile(__dirname + '/public/index.html');
 });
 
 
