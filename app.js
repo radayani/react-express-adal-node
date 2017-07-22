@@ -214,6 +214,7 @@ app.get(`/home`, function (req, res) {
   res.sendFile(__dirname + '/public/index.html')
 });
 
+
 var logoutAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=http://sfvotes.websites.net/loginAgain';
 
 app.get('/loginAgain', function (req, res) {
@@ -487,20 +488,24 @@ app.get('/api/getPin', (req, res) => {
   //    res.sendFile(__dirname + '/public/index.html')
 });
 function slash_pin(connection, sqlQuery, res) {
-  connection.execSql(
-    new Request(sqlQuery,
-      function (err, rowCount, rows) {
+  connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
         var item = "";
         {
           if (rows[0] == undefined) {
+            console.log(item + " row[0]: " + row[0]);
             res.status(400);
             res.redirect(`/home`);
             
           }
           else {
-            res.status(200);
+            console.log("else row[0]: " + row[0]);
+            
             item = rows[0][0].value.toString();
+            console.log(" else item: " + item );
+            
             res.cookie('myPIN', item);
+            res.status(200);
+            
             res.redirect(`/home/${res.cookies.myPIN}`);
 
           }
