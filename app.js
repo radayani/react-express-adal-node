@@ -500,13 +500,13 @@ console.log("rows: "+ rows);
       console.log("aftr this");
 
       if (rows[0] == undefined) {
-        console.log(item + " row[0]: " + row[0]);
+        console.log(item + " row[0]: " + rows[0]);
         res.status(400);
         res.redirect(`/home`);
 
       }
       else {
-        console.log("else row[0]: " + row[0]);
+        console.log("else row[0]: " + rows[0]);
 
         item = rows[0][0].value.toString();
         console.log(" else item: " + item);
