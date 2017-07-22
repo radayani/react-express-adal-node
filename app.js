@@ -134,8 +134,8 @@ if (!parametersFile) {
 }
 
 var authorityUrl = sampleParameters.authorityHostUrl + '/' + sampleParameters.tenant;
-var redirectUri = 'http://sfvotes.azurewebsites.net/getAToken';
-// var redirectUri = 'http://localhost:3000/getAToken';
+// var redirectUri = 'http://sfvotes.azurewebsites.net/getAToken';
+var redirectUri = 'http://localhost:3000/getAToken';
 var resource = '00000002-0000-0000-c000-000000000000';
 
 var templateAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/authorize?response_type=code&client_id=<client_id>&redirect_uri=<redirect_uri>&state=<state>&resource=<resource>';
@@ -201,12 +201,12 @@ app.get('/getAToken', function (req, res) {
 });
 
 // app.get(`/user/${alias}/register`, function(req, res) {
-app.get(`/home/:myPin`, function (req, res) {
-  console.log("/home/mypin url me enter kiya");
-  // res.redirect(`/api/getPin?alias=${alias}`);
-  // res.redirect("http://localhost:3001/home");
-  res.sendFile(__dirname + '/public/index.html');
-});
+// app.get(`/home/:myPin`, function (req, res) {
+//   console.log("/home/mypin url me enter kiya");
+//   // res.redirect(`/api/getPin?alias=${alias}`);
+//   // res.redirect("http://localhost:3001/home");
+//   res.sendFile(__dirname + '/public/index.html');
+// });
 
 // app.get(`/user/${alias}/register`, function(req, res) {
 app.get(`/home`, function (req, res) {
@@ -504,7 +504,6 @@ console.log("rows: "+ rows);
       if (rows[0] == undefined) {
         console.log(item + " row[0]: " + rows[0]);
         res.status(400);
-        res.redirect(`/home`);
 
       }
       else {
@@ -516,11 +515,11 @@ console.log("rows: "+ rows);
         res.cookie('myPIN', item);
         res.status(200);
 
-        res.redirect(`/home/${item}`);
 
       }
     }
     // res.json(item);
+        res.redirect(`/home`);
 
     connection.close();
   })
