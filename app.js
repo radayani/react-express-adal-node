@@ -22,12 +22,12 @@ var Connection = require('tedious').Connection;
 var Request = require('tedious').Request;
 var config =
   {
-    userName: 'sciencefair', // update me
-    password: 'oneweek@123', // update me
-    server: 'sfdbserver.database.windows.net', // update me
+    userName: 'sciencefair',
+    password: 'twoweek@123',
+    server: 'sfvoteserver.database.windows.net',
     options:
     {
-      database: 'sfdbppe' //update me
+      database: 'sfvotedb'
       , encrypt: true
       , rowCollectionOnRequestCompletion: true
     }
@@ -201,12 +201,18 @@ app.get('/getAToken', function (req, res) {
 });
 
 // app.get(`/user/${alias}/register`, function(req, res) {
-app.get(`/home`, function (req, res) {
+app.get(`/home/:myPin`, function (req, res) {
   // res.redirect(`/api/getPin?alias=${alias}`);
   // res.redirect("http://localhost:3001/home");
   res.sendFile(__dirname + '/public/index.html')
 });
 
+// app.get(`/user/${alias}/register`, function(req, res) {
+app.get(`/home`, function (req, res) {
+  // res.redirect(`/api/getPin?alias=${alias}`);
+  // res.redirect("http://localhost:3001/home");
+  res.sendFile(__dirname + '/public/index.html')
+});
 
 var logoutAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=http://sfvotes.websites.net/loginAgain';
 
@@ -485,19 +491,23 @@ function slash_pin(connection, sqlQuery, res) {
     new Request(sqlQuery,
       function (err, rowCount, rows) {
         var item = "";
-        // {
-        // if (rows[0] == undefined) {
-        //   res.status(400).send("Pin Not Found");
-        // }
-        // else {
-        item = rows[0][0].value.toString();
-        // }
-        // }
+        {
+          if (rows[0] == undefined) {
+            res.status(400);
+            res.redirect(`/home`);
+            
+          }
+          else {
+            res.status(200);
+            item = rows[0][0].value.toString();
+            res.cookie('myPIN', item);
+            res.redirect(`/home/${res.cookies.myPIN}`);
+
+          }
+        }
         // res.json(item);
 
         connection.close();
-        res.cookie('myPIN', item);
-        res.redirect('/home');
       })
   ); // end execSql
 };
@@ -515,8 +525,6 @@ app.get('/api/getRegisteredProjects', (req, res) => {
       slash_votesforuser(
         this,
         "select pm.project_id, p.title,p.description,v.venue ,v.Location from ProjectMembers pm INNER JOIN Projects p on p.id=pm.project_id INNER JOIN Registration r on pm.project_id=r.project_id INNER JOIN venue v on r.venue_id = v.id where pm.alias like '%" + req.query.alias + "%'",
-        // "SELECT r.project_id, p.title, p.tagline, p.description, v.venue ,v.Location FROM Registration r INNER JOIN Projects p ON r.Project_id =p.id INNER JOIN Venue v on r.venue_id = v.id WHERE r.alias like '%" + req.query.alias + "%' ",
-        // "SELECT r.project_id, p.title, p.tagline, p.description FROM Registration r INNER JOIN Projects p ON r.Project_id =p.id WHERE r.alias like '%" + req.query.alias + "%'",//Todo: SQL Injection Fix
         res
       );
     });
