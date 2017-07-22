@@ -514,7 +514,7 @@ console.log("rows: "+ rows);
         res.cookie('myPIN', item);
         res.status(200);
 
-        res.redirect(`/home/${res.cookies.myPIN}`);
+        res.redirect(`/home/${item}`);
 
       }
     }
