@@ -66,10 +66,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-// app.use(serveStatic('D:\home\site\wwwroot\public' ));
-// app.get('/', function(req, res){
-//   res.redirect('/user');
-// });
+app.use(serveStatic('D:\home\site\wwwroot\public' ));
+app.get('/home/*', function(req, res){
+    res.sendFile(__dirname + '/public/index.html');
+  // res.redirect('/user');
+});
 app.use(cors());
 
 
@@ -436,23 +437,20 @@ function slash_description(connection, sqlQuery, res) {
 
 
 
-app.post('/api/savePin',
-  function (req, res) {
-    var alias = req.body.alias;
-    var uniquePin = req.body.unique_pin;
-    if (uniquePin != undefined && alias != undefined) {
-      var sql = "INSERT INTO UniquePin (alias,unique_pin) SELECT '" + alias + "','" + uniquePin + "'  WHERE NOT EXISTS (SELECT * FROM UniquePin WHERE alias='" + alias + "')";
-    }
-    new Connection(config)
-      .on('connect',
-      function () {
-        execNonQueryNew(
-          this,
-          sql,
-          res
-        );
-      });
+app.post('/api/savePin', function (req, res) {
+  var alias = req.body.alias;
+  var uniquePin = req.body.unique_pin;
+  if (uniquePin != undefined && alias != undefined) {
+    var sql = "INSERT INTO UniquePin (alias,unique_pin) SELECT '" + alias + "','" + uniquePin + "'  WHERE NOT EXISTS (SELECT * FROM UniquePin WHERE alias='" + alias + "')";
+  }
+  new Connection(config).on('connect', function () {
+    execNonQueryNew(
+      this,
+      sql,
+      res
+    );
   });
+});
 
 
 // app.get('/api/savePin',
@@ -492,25 +490,17 @@ function slash_pin(connection, sqlQuery, res) {
   console.log("entered slash_pin");
 
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
-    console.log("entered execsql ");
-console.log("rowcount" + rowCount);
-console.log("rows: "+ rows);
     var item = "";
-    console.log("before this ");
 
     {
-      console.log("aftr this");
 
       if (rows[0] == undefined) {
-        console.log(item + " row[0]: " + rows[0]);
         res.status(400);
 
       }
       else {
-        console.log("else row[0]: " + rows[0]);
 
         item = rows[0][0].value.toString();
-        console.log(" else item: " + item);
 
         res.cookie('myPIN', item);
         res.status(200);
@@ -519,7 +509,7 @@ console.log("rows: "+ rows);
       }
     }
     // res.json(item);
-        res.redirect(`/home`);
+    res.redirect(`/home`);
 
     connection.close();
   })
