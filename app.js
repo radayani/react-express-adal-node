@@ -491,7 +491,8 @@ function slash_pin(connection, sqlQuery, res) {
 
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
     console.log("entered execsql ");
-
+console.log("rowcount" + rowCount);
+console.log("rows: "+ rows);
     var item = "";
     console.log("before this ");
 
