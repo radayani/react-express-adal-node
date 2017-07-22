@@ -596,7 +596,7 @@ app.post('/api/registerProject',
 
 // // app.use('/', index);
 // // app.use('/users', users);
-app.use('/api/votedProjects', votedProjects);
+// app.use('/api/votedProjects', votedProjects);
 // app.use('/api/getRegisteredProjects', registeredProjects);
 
 // catch 404 and forward to error handler
