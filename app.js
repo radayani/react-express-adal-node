@@ -307,17 +307,17 @@ function execDataSet(connection, sqlQuery) {
 
 
 
-// app.get('/api/votedProjects', (req, res) => {
-//   new Connection(config)
-//     .on('connect',
-//     function () {
-//       slash_votesforuser(
-//         this,
-//         "SELECT v.id,p.title, p.tagline, p.description FROM Votes v INNER JOIN Projects p ON v.id = p.id WHERE v.alias = '" + req.query.alias + "'",//Todo: SQL Injection Fix
-//         res
-//       );
-//     });
-// });
+app.get('/api/votedProjects', (req, res) => {
+  new Connection(config)
+    .on('connect',
+    function () {
+      slash_votesforuser(
+        this,
+        "SELECT v.id,p.title, p.tagline, p.description FROM Votes v INNER JOIN Projects p ON v.id = p.id WHERE v.alias = '" + req.query.alias + "'",//Todo: SQL Injection Fix
+        res
+      );
+    });
+});
 function slash_votesforuser(connection, sqlQuery, res) {
   connection.execSql(
     new Request(sqlQuery,
