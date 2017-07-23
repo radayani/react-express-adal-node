@@ -407,6 +407,21 @@ function slash_votes(connection, sqlQuery, res, req) {
 
 
 
+
+app.get('/api/projectTitle', (req, res) => {
+  new Connection(config)
+    .on('connect',
+    function () {
+      slash_description(
+        this,
+        "SELECT title FROM Projects WHERE id = " + req.query.id + "",//Todo: SQL Injection Fix
+        res
+      );
+    });
+});
+
+
+
 app.get('/api/projectDescription', (req, res) => {
   new Connection(config)
     .on('connect',
