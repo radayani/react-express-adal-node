@@ -360,7 +360,7 @@ app.get('/api/getMyUnRegProjects', (req, res) => {
     function () {
       slash_votesforuser( //TODO:change function name
         this,
-        "SELECT P.id,P.title AS name FROM Projects P INNER JOIN ProjectMembers PM ON P.id = PM.project_id LEFT OUTER JOIN Registration R ON P.id = R.project_id WHERE PM.alias like '%" + req.query.alias + "%' AND R.project_id IS NULL",//Todo: SQL Injection Fix
+        "SELECT P.id,P.tagline, P.description, P.title AS name FROM Projects P INNER JOIN ProjectMembers PM ON P.id = PM.project_id LEFT OUTER JOIN Registration R ON P.id = R.project_id WHERE PM.alias like '%" + req.query.alias + "%' AND R.project_id IS NULL",//Todo: SQL Injection Fix
         res
       );
     });
@@ -528,7 +528,7 @@ app.get('/api/getRegisteredProjects', (req, res) => {
     function () {
       slash_votesforuser(
         this,
-        "select pm.project_id, p.title,p.description,v.venue ,v.Location from ProjectMembers pm INNER JOIN Projects p on p.id=pm.project_id INNER JOIN Registration r on pm.project_id=r.project_id INNER JOIN venue v on r.venue_id = v.id where pm.alias like '%" + req.query.alias + "%'",
+        "select pm.project_id, p.title,p.tagline, p.description,v.venue ,v.Location from ProjectMembers pm INNER JOIN Projects p on p.id=pm.project_id INNER JOIN Registration r on pm.project_id=r.project_id INNER JOIN venue v on r.venue_id = v.id where pm.alias like '%" + req.query.alias + "%'",
         res
       );
     });
