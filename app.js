@@ -1,12 +1,13 @@
 var express = require('express');
 const appInsights = require("applicationinsights");
-appInsights.setup("c504111c-5c61-4424-9428-b0a0ede8fbd4   ")
+appInsights.setup("75234f11-9d11-442d-bcbe-8a54064621a0")
   .setAutoDependencyCorrelation(false)
   .setAutoCollectRequests(true)
   .setAutoCollectPerformance(true)
   .setAutoCollectExceptions(true)
   .setAutoCollectDependencies(true)
   .start();
+  
 var fs = require('fs');
 var crypto = require('crypto');
 var AuthenticationContext = require('adal-node').AuthenticationContext;
