@@ -7,7 +7,7 @@ appInsights.setup("75234f11-9d11-442d-bcbe-8a54064621a0")
   .setAutoCollectExceptions(true)
   .setAutoCollectDependencies(true)
   .start();
-  
+
 var fs = require('fs');
 var crypto = require('crypto');
 var AuthenticationContext = require('adal-node').AuthenticationContext;
@@ -330,21 +330,30 @@ function slash_votesforuser(connection, sqlQuery, res) {
   connection.execSql(
     new Request(sqlQuery,
       function (err, rowCount, rows) {
-        var result = [];
-        for (var r = 0; r < rows.length; r++) {
-          // console.log('*********RowStart************');
-          var item = {};
-          for (var c = 0; c < rows[r].length; c++) {
-            item[rows[r][c].metadata.colName] = rows[r][c].value.toString();
-            // console.log(rows[r][c].metadata.colName);
-            // console.log(rows[r][c].value);
-          }
-          result.push(item);
-          // console.log('*********RowEnd************');
+        if (rows == null || rows == 'undefined') {
+          res.status(404);
+        } else if (err) {
+          console.log('Get Dataset ERROR: ' + err);
+          res.status(500).send({ status: 500, error: err });
         }
-        res.json(result);
-        //  res.render('index',{pageTitle:'Your Votes',votes:result});
-        connection.close();
+        else {
+          var result = [];
+          for (var r = 0; r < rows.length; r++) {
+            // console.log('*********RowStart************');
+            var item = {};
+            for (var c = 0; c < rows[r].length; c++) {
+              item[rows[r][c].metadata.colName] = rows[r][c].value.toString();
+              // console.log(rows[r][c].metadata.colName);
+              // console.log(rows[r][c].value);
+            }
+            result.push(item);
+            // console.log('*********RowEnd************');
+          }
+          connection.close();          
+          res.status(200);
+          res.json(result);
+          //  res.render('index',{pageTitle:'Your Votes',votes:result});
+        }
       })
   ); // end execSql
 }; // end slash
