@@ -44,6 +44,9 @@ var config =
       database: 'sfvotedb'
       , encrypt: true
       , rowCollectionOnRequestCompletion: true
+     
+      , instancename: 'SQLEXPRESS'
+
     }
   }
 
@@ -334,33 +337,33 @@ app.get('/api/votedProjects', (req, res) => {
 });
 function slash_votesforuser(connection, sqlQuery, res) {
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
-        console.log("Success!"+sqlQuery);
-        res.status(200).send("hi there");
-        // if (rows == null || rows == 'undefined') {
-        //   res.status(404);
-        // } else if (err) {
-        //   console.log('Get Dataset ERROR: ' + err);
-        //   res.status(500).send({ status: 500, error: err });
-        // }
-        // else {
-        //   var result = [];
-        //   for (var r = 0; r < rows.length; r++) {
-        //     // console.log('*********RowStart************');
-        //     var item = {};
-        //     for (var c = 0; c < rows[r].length; c++) {
-        //       item[rows[r][c].metadata.colName] = rows[r][c].value.toString();
-        //       // console.log(rows[r][c].metadata.colName);
-        //       // console.log(rows[r][c].value);
-        //     }
-        //     result.push(item);
-        //     // console.log('*********RowEnd************');
-        //   }
-        //   connection.close();          
-        //   res.status(200);
-        //   res.json(result);
-        //   //  res.render('index',{pageTitle:'Your Votes',votes:result});
-        // }
-      })
+    console.log("Success!" + sqlQuery);
+    res.status(200).json({"hi":"there"});
+    // if (rows == null || rows == 'undefined') {
+    //   res.status(404);
+    // } else if (err) {
+    //   console.log('Get Dataset ERROR: ' + err);
+    //   res.status(500).send({ status: 500, error: err });
+    // }
+    // else {
+    //   var result = [];
+    //   for (var r = 0; r < rows.length; r++) {
+    //     // console.log('*********RowStart************');
+    //     var item = {};
+    //     for (var c = 0; c < rows[r].length; c++) {
+    //       item[rows[r][c].metadata.colName] = rows[r][c].value.toString();
+    //       // console.log(rows[r][c].metadata.colName);
+    //       // console.log(rows[r][c].value);
+    //     }
+    //     result.push(item);
+    //     // console.log('*********RowEnd************');
+    //   }
+    //   connection.close();          
+    //   res.status(200);
+    //   res.json(result);
+    //   //  res.render('index',{pageTitle:'Your Votes',votes:result});
+    // }
+  })
   ); // end execSql
 }; // end slash
 
@@ -574,11 +577,11 @@ app.get('/api/getRegisteredProjects', (req, res) => {
           res
         );
       }
-      catch(err) {
+      catch (err) {
         console.log("console log " + err);
         client.trackException(new Error("exception " + err));
       }
-      
+
     });
 });
 
@@ -655,6 +658,6 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-app.listen(3000, () => { console.log('Server started on port 3000') });
+app.listen(3002, () => { console.log('Server started on port 3000') });
 module.exports = app;
 
