@@ -159,7 +159,7 @@ function createAuthorizationUrl(state) {
 }
 
 app.get('/api/login', function (req, res) {
-  console.log("hi");
+  // console.log("hi");
   crypto.randomBytes(48, function (ex, buf) {
     var token = buf.toString('base64').replace(/\//g, '_').replace(/\+/g, '-');
 
@@ -219,7 +219,7 @@ app.get('/getAToken', function (req, res) {
 
 // app.get(`/user/${alias}/register`, function(req, res) {
 app.get(`/home`, function (req, res) {
-  console.log("/home url me enter kiya");
+  // console.log("/home url me enter kiya");
   // res.redirect(`/api/getPin?alias=${alias}`);
   // res.redirect("http://localhost:3001/home");
   res.sendFile(__dirname + '/public/index.html');
@@ -332,15 +332,15 @@ function slash_votesforuser(connection, sqlQuery, res) {
       function (err, rowCount, rows) {
         var result = [];
         for (var r = 0; r < rows.length; r++) {
-          console.log('*********RowStart************');
+          // console.log('*********RowStart************');
           var item = {};
           for (var c = 0; c < rows[r].length; c++) {
             item[rows[r][c].metadata.colName] = rows[r][c].value.toString();
-            console.log(rows[r][c].metadata.colName);
-            console.log(rows[r][c].value);
+            // console.log(rows[r][c].metadata.colName);
+            // console.log(rows[r][c].value);
           }
           result.push(item);
-          console.log('*********RowEnd************');
+          // console.log('*********RowEnd************');
         }
         res.json(result);
         //  res.render('index',{pageTitle:'Your Votes',votes:result});
@@ -447,7 +447,7 @@ function slash_description(connection, sqlQuery, res) {
       function (err, rowCount, rows) {
         var item = {}; {
           item = rows[0][0].value.toString();
-          console.log(item);
+          // console.log(item);
         }
         res.json(item);
         connection.close();
@@ -495,13 +495,13 @@ app.post('/api/savePin', function (req, res) {
 
 app.get('/api/getPin', (req, res) => {
   new Connection(config).on('connect', function () {
-    console.log("hello");
+    // console.log("hello");
     slash_pin(
       this,
       "SELECT unique_pin FROM UniquePin WHERE alias like '%" + req.query.alias + "%'",//Todo: SQL Injection Fix
       res
     );
-    console.log("bye" + res);
+    // console.log("bye" + res);
   });
   // console.log("RES: " + res);
   //   localStorage.setItem('myPin', res);
@@ -510,7 +510,7 @@ app.get('/api/getPin', (req, res) => {
   //    res.sendFile(__dirname + '/public/index.html')
 });
 function slash_pin(connection, sqlQuery, res) {
-  console.log("entered slash_pin");
+  // console.log("entered slash_pin");
 
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
     var item = "";
@@ -581,10 +581,10 @@ function execNonQueryNew(connection, sqlQuery, res) {
 
 app.post('/api/registerProject',
   function (req, res) {
-    console.log(req.body);
+    // console.log(req.body);
     var projects = req.body.projects;
     var venue_id = req.body.venue_id;
-    console.log(projects);
+    // console.log(projects);
     //var sessionValue = req.session.authInfo;
     //var authString = JSON.stringify(sessionValue);
     // var sessionValue = req.session.authInfo;
@@ -594,7 +594,7 @@ app.post('/api/registerProject',
     // var userID = sessionValue.userId;
     // console.log("userID: " + userID);
     var alias = req.body.alias;
-    console.log('registerprojects:' + alias);
+    // console.log('registerprojects:' + alias);
     var sql = "IF NOT EXISTS (SELECT * FROM Registration WHERE alias='" + alias + "' AND project_id=" + projects + ")BEGIN INSERT INTO Registration (project_id,alias,venue_id) SELECT " + projects + ", '" + alias + "', " + venue_id + " ; Update venue set AllocatedBooths=AllocatedBooths+1 where Id=" + venue_id + "; END"
     new Connection(config)
       .on('connect',
