@@ -334,7 +334,8 @@ app.get('/api/votedProjects', (req, res) => {
 });
 function slash_votesforuser(connection, sqlQuery, res) {
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
-        console.log("Success!"+sqlQuery)
+        console.log("Success!"+sqlQuery);
+        res.status(200).send("hi there");
         // if (rows == null || rows == 'undefined') {
         //   res.status(404);
         // } else if (err) {
