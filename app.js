@@ -1,6 +1,6 @@
 var express = require('express');
 const appInsights = require("applicationinsights");
-appInsights.setup("c504111c-5c61-4424-9428-b0a0ede8fbd4")
+appInsights.setup("c504111c-5c61-4424-9428-b0a0ede8fbd4   ")
   .setAutoDependencyCorrelation(false)
   .setAutoCollectRequests(true)
   .setAutoCollectPerformance(true)
