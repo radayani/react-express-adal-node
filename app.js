@@ -1,12 +1,15 @@
 var express = require('express');
 const appInsights = require("applicationinsights");
 appInsights.setup("75234f11-9d11-442d-bcbe-8a54064621a0")
+  .setAutoCollectConsole(true)
   .setAutoDependencyCorrelation(false)
   .setAutoCollectRequests(true)
   .setAutoCollectPerformance(true)
   .setAutoCollectExceptions(true)
   .setAutoCollectDependencies(true)
   .start();
+
+
 
 var fs = require('fs');
 var crypto = require('crypto');
@@ -22,7 +25,10 @@ var cors = require('cors')
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
-var serveStatic = require('serve-static')
+var serveStatic = require('serve-static');
+var client = appInsights.getClient();
+
+
 
 
 //Db
@@ -327,9 +333,7 @@ app.get('/api/votedProjects', (req, res) => {
     });
 });
 function slash_votesforuser(connection, sqlQuery, res) {
-  connection.execSql(
-    new Request(sqlQuery,
-      function (err, rowCount, rows) {
+  connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
         if (rows == null || rows == 'undefined') {
           res.status(404);
         } else if (err) {
@@ -558,12 +562,19 @@ app.get('/api/getRegisteredProjects', (req, res) => {
 
     .on('connect',
     function () {
-      var alias = req.query.alias
-      slash_votesforuser(
-        this,
-        "select pm.project_id, p.title,p.tagline, p.description,v.venue ,v.Location from ProjectMembers pm INNER JOIN Projects p on p.id=pm.project_id INNER JOIN Registration r on pm.project_id=r.project_id INNER JOIN venue v on r.venue_id = v.id where pm.alias ='" + req.query.alias + "'",
-        res
-      );
+      try {
+        var alias = req.query.alias
+        slash_votesforuser(
+          this,
+          "select pm.project_id, p.title,p.tagline, p.description,v.venue ,v.Location from ProjectMembers pm INNER JOIN Projects p on p.id=pm.project_id INNER JOIN Registration r on pm.project_id=r.project_id INNER JOIN venue v on r.venue_id = v.id where pm.alias ='" + req.query.alias + "'",
+          res
+        );
+      }
+      catch(err) {
+        console.log("console log " + err);
+        client.trackException(new Error("exception " + err));
+      }
+      
     });
 });
 
