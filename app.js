@@ -26,7 +26,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var serveStatic = require('serve-static');
-var client = appInsights.getClient();
+var client = appInsights.getClient("75234f11-9d11-442d-bcbe-8a54064621a0");
 
 
 
@@ -563,6 +563,8 @@ app.get('/api/getRegisteredProjects', (req, res) => {
     .on('connect',
     function () {
       try {
+        client.trackEvent(new Error("event" + req.query.alias));
+        console.log("try console");
         var alias = req.query.alias
         slash_votesforuser(
           this,
@@ -651,6 +653,6 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-app.listen(3000, () => { console.log('Server started on port 3000') });
+app.listen(3002, () => { console.log('Server started on port 3000') });
 module.exports = app;
 
