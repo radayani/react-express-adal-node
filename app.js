@@ -1,6 +1,6 @@
 var express = require('express');
 const appInsights = require("applicationinsights");
-appInsights.setup("88473b02-fab5-47d5-bca1-7e4da30cf8d5")
+appInsights.setup("c504111c-5c61-4424-9428-b0a0ede8fbd4")
   .setAutoDependencyCorrelation(false)
   .setAutoCollectRequests(true)
   .setAutoCollectPerformance(true)
@@ -548,9 +548,10 @@ app.get('/api/getRegisteredProjects', (req, res) => {
 
     .on('connect',
     function () {
+      var alias = req.query.alias
       slash_votesforuser(
         this,
-        "select pm.project_id, p.title,p.tagline, p.description,v.venue ,v.Location from ProjectMembers pm INNER JOIN Projects p on p.id=pm.project_id INNER JOIN Registration r on pm.project_id=r.project_id INNER JOIN venue v on r.venue_id = v.id where pm.alias like '%" + req.query.alias + "%'",
+        "select pm.project_id, p.title,p.tagline, p.description,v.venue ,v.Location from ProjectMembers pm INNER JOIN Projects p on p.id=pm.project_id INNER JOIN Registration r on pm.project_id=r.project_id INNER JOIN venue v on r.venue_id = v.id where pm.alias ='" + req.query.alias + "'",
         res
       );
     });
