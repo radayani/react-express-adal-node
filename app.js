@@ -1,5 +1,12 @@
 var express = require('express');
-
+const appInsights = require("applicationinsights");
+appInsights.setup("88473b02-fab5-47d5-bca1-7e4da30cf8d5")
+  .setAutoDependencyCorrelation(false)
+  .setAutoCollectRequests(true)
+  .setAutoCollectPerformance(true)
+  .setAutoCollectExceptions(true)
+  .setAutoCollectDependencies(true)
+  .start();
 var fs = require('fs');
 var crypto = require('crypto');
 var AuthenticationContext = require('adal-node').AuthenticationContext;
@@ -66,9 +73,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(serveStatic('D:\home\site\wwwroot\public' ));
-app.get('/home/*', function(req, res){
-    res.sendFile(__dirname + '/public/index.html');
+app.use(serveStatic('D:\home\site\wwwroot\public'));
+app.get('/home/*', function (req, res) {
+  res.sendFile(__dirname + '/public/index.html');
   // res.redirect('/user');
 });
 app.use(cors());
