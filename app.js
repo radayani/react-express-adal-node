@@ -658,6 +658,6 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-app.listen(3002, () => { console.log('Server started on port 3000') });
+app.listen(3000, () => { console.log('Server started on port 3000') });
 module.exports = app;
 
