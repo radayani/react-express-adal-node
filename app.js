@@ -340,32 +340,32 @@ function slash_votesforuser(connection, sqlQuery, res) {
     console.log("Success!" + sqlQuery);
 
 
-    connection.close();          
+    // connection.close();          
 
-    return res.status(200).json({"hi":"there"});
-    // if (rows == null || rows == 'undefined') {
-    //   res.status(404);
-    // } else if (err) {
-    //   console.log('Get Dataset ERROR: ' + err);
-    //   res.status(500).send({ status: 500, error: err });
-    // }
-    // else {
-    //   var result = [];
-    //   for (var r = 0; r < rows.length; r++) {
-    //     // console.log('*********RowStart************');
-    //     var item = {};
-    //     for (var c = 0; c < rows[r].length; c++) {
-    //       item[rows[r][c].metadata.colName] = rows[r][c].value.toString();
-    //       // console.log(rows[r][c].metadata.colName);
-    //       // console.log(rows[r][c].value);
-    //     }
-    //     result.push(item);
-    //     // console.log('*********RowEnd************');
-    //   }
-    //   res.status(200);
-    //   res.json(result);
-    //   //  res.render('index',{pageTitle:'Your Votes',votes:result});
-    // }
+    // return res.status(200).json({"hi":"there"});
+    if (rows == null || rows == 'undefined') {
+      res.status(404);
+    } else if (err) {
+      console.log('Get Dataset ERROR: ' + err);
+      res.status(500).send({ status: 500, error: err });
+    }
+    else {
+      var result = [];
+      for (var r = 0; r < rows.length; r++) {
+        // console.log('*********RowStart************');
+        var item = {};
+        for (var c = 0; c < rows[r].length; c++) {
+          item[rows[r][c].metadata.colName] = rows[r][c].value.toString();
+          // console.log(rows[r][c].metadata.colName);
+          // console.log(rows[r][c].value);
+        }
+        result.push(item);
+        // console.log('*********RowEnd************');
+      }
+      res.status(200);
+      res.json(result);
+      //  res.render('index',{pageTitle:'Your Votes',votes:result});
+    }
   })
   ); // end execSql
 }; // end slash
@@ -522,13 +522,7 @@ app.get('/api/getPin', (req, res) => {
       "SELECT unique_pin FROM UniquePin WHERE alias like '%" + req.query.alias + "%'",//Todo: SQL Injection Fix
       res
     );
-    // console.log("bye" + res);
   });
-  // console.log("RES: " + res);
-  //   localStorage.setItem('myPin', res);
-  //   res.cookie('myPIN', res);
-  //   console.log(req.session);
-  //    res.sendFile(__dirname + '/public/index.html')
 });
 function slash_pin(connection, sqlQuery, res) {
   // console.log("entered slash_pin");
@@ -581,7 +575,6 @@ app.get('/api/getRegisteredProjects', (req, res) => {
         );
       }
       catch (err) {
-        console.log("console log " + err);
         client.trackException(new Error("exception " + err));
       }
 
