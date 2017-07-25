@@ -34,13 +34,6 @@ var client = appInsights.getClient("75234f11-9d11-442d-bcbe-8a54064621a0");
 //Db
 var Connection = require('tedious').Connection;
 var Request = require('tedious').Request;
-var ConnectionPool = require('tedious-connection-pool');
-
-var poolConfig = {
-    min: 2,
-    max: 50,
-    log: true
-};
 var config =
   {
     userName: 'sciencefair',
@@ -57,13 +50,6 @@ var config =
     }
   }
 
-
-//create the pool
-var pool = new ConnectionPool(poolConfig, config);
-
-pool.on('error', function(err) {
-    client.trackException("Error Pool " + err);
-});
 
 
 // var login = require('./routes/login');
@@ -349,50 +335,7 @@ app.get('/api/votedProjects', (req, res) => {
     });
 });
 function slash_votesforuser(connection, sqlQuery, res) {
-
-// //acquire a connection
-// pool.acquire(function (err, connection) {
-//     if (err) {
-//         console.error(err);
-//         return;
-//     }
-
-//     //use the connection as normal
-//     var request = new Request(sqlQuery, function(err, rowCount) {
-//         if (err) {
-//             client.trackException( "Error with Tedious Request: "  + err);
-//             return;
-//         }
-
-//         console.log('rowCount: ' + rowCount);
-
-//         //release the connection back to the pool when finished
-//         connection.release();
-//     });
-
-//     request.on('row', function(columns) {
-//         console.log('value: ' + columns[0].value);
-//     });
-
-//     connection.execSql(request);
-// });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
+ connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
     console.log("Success!" + sqlQuery);
     if (rows == null || rows == 'undefined') {
       res.status(404);
