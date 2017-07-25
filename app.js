@@ -509,7 +509,7 @@ app.get('/api/validatePin', (req, res) => {
   new Connection(config).on('connect', function () {
     validateFun(
       this,
-      "SELECT COUNT(alias) FROM UniquePin WHERE alias = '"  +  req.query.alias  +  "' and unique_pin = '"  +  req.query.pin + "' ",//Todo: SQL Injection Fix
+      "SELECT COUNT(alias) FROM UniquePin WHERE alias = '" + req.query.alias + "' and unique_pin = '" + req.query.pin + "' ",//Todo: SQL Injection Fix
       res
     );
   });
