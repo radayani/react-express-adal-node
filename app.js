@@ -358,7 +358,7 @@ function slash_votesforuser(connection, sqlQuery, res) {
     //     result.push(item);
     //     // console.log('*********RowEnd************');
     //   }
-    //   connection.close();          
+    connection.close();          
     //   res.status(200);
     //   res.json(result);
     //   //  res.render('index',{pageTitle:'Your Votes',votes:result});
