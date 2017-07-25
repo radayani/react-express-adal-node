@@ -36,7 +36,7 @@ if (!parametersFile) {
 }
 
 var authorityUrl = sampleParameters.authorityHostUrl + '/' + sampleParameters.tenant;
-var redirectUri = 'http://sfvotes.azurewebsites.net/getAToken';
+var redirectUri = 'http://sfvote.azurewebsites.net/getAToken';
 // var redirectUri = 'http://localhost:3000/getAToken';
 var resource = '00000002-0000-0000-c000-000000000000';
 
@@ -81,10 +81,7 @@ app.get('/getAToken', function (req, res) {
     res.cookie('access_token', response.accessToken);
     res.cookie('alias', alias);
     if (err) {
-      // window.location.replace(`http://sfvotes.azurewebistes.net/user/${alias}/register`);
-      // res.redirect(`/user/${alias}/register`);
       res.redirect(`/api/getPin?alias=${alias}`);
-      // res.sendFile(__dirname + '/public/index.html');
       return;
     }
 
@@ -94,8 +91,6 @@ app.get('/getAToken', function (req, res) {
         message += 'refreshError: ' + refreshErr.message + '\n';
       }
       message += 'refreshResponse: ' + JSON.stringify(refreshResponse);
-      // res.redirect(`/user/${alias}/register`);
-      // res.sendFile(__dirname + '/public/index.html');
       res.redirect(`/api/getPin?alias=${alias}`);
     });
   }
