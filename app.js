@@ -44,7 +44,7 @@ var config =
       database: 'sfvotedb'
       , encrypt: true
       , rowCollectionOnRequestCompletion: true
-     
+
       , instancename: 'SQLEXPRESS'
 
     }
@@ -335,7 +335,7 @@ app.get('/api/votedProjects', (req, res) => {
     });
 });
 function slash_votesforuser(connection, sqlQuery, res) {
- connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
+  connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
     console.log("Success!" + sqlQuery);
     if (rows == null || rows == 'undefined') {
       res.status(404);
@@ -346,18 +346,18 @@ function slash_votesforuser(connection, sqlQuery, res) {
     else {
       var result = [];
       for (var r = 0; r < rows.length; r++) {
-      
+
         var item = {};
         for (var c = 0; c < rows[r].length; c++) {
-          item[rows[r][c].metadata.colName] = rows[r][c].value.toString();    
+          item[rows[r][c].metadata.colName] = rows[r][c].value.toString();
         }
-        result.push(item); 
+        result.push(item);
       }
       res.status(200);
       res.json(result);
       //  res.render('index',{pageTitle:'Your Votes',votes:result});
     }
-  connection.close();
+    connection.close();
   })
   ); // end execSql
 }; // end slash
@@ -505,6 +505,41 @@ app.post('/api/savePin', function (req, res) {
 
 
 
+app.get('/api/validatePin', (req, res) => {
+  new Connection(config).on('connect', function () {
+    validateFun(
+      this,
+      "SELECT COUNT(alias) FROM UniquePin WHERE alias = '"  +  req.query.alias  +  "' and unique_pin = '"  +  req.query.pin + "' ",//Todo: SQL Injection Fix
+      res
+    );
+  });
+});
+
+
+
+function validateFun(connection, sqlQuery, res) {
+  connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
+    var item = "";
+    if (rows == null || rows == 'undefined') {
+      client.trackEvent("Rows null " + rows[0]);
+      res.status(404).send({ status: 400, rows: rows[0] });
+    } else if (err) {
+      client.trackException('Get Dataset ERROR: ' + err);
+      res.status(500).send({ status: 500, error: err });
+    }
+    else {
+      item = rows[0][0].value.toString();
+
+      client.trackEvent("Pin Found: " + item);
+      res.status(200).send(item);
+    }
+    // res.json(item);
+    connection.close();
+  })
+  ); // end execSql
+};
+
+
 
 app.get('/api/getPin', (req, res) => {
   new Connection(config).on('connect', function () {
@@ -646,6 +681,6 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-app.listen(3000, () => { console.log('Server started on port 3000') });
+app.listen(3002, () => { console.log('Server started on port 3000') });
 module.exports = app;
 
