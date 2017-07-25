@@ -34,6 +34,13 @@ var client = appInsights.getClient("75234f11-9d11-442d-bcbe-8a54064621a0");
 //Db
 var Connection = require('tedious').Connection;
 var Request = require('tedious').Request;
+var ConnectionPool = require('tedious-connection-pool');
+
+var poolConfig = {
+    min: 2,
+    max: 50,
+    log: true
+};
 var config =
   {
     userName: 'sciencefair',
@@ -50,6 +57,13 @@ var config =
     }
   }
 
+
+//create the pool
+var pool = new ConnectionPool(poolConfig, config);
+
+pool.on('error', function(err) {
+    client.trackException("Error Pool " + err);
+});
 
 
 // var login = require('./routes/login');
@@ -95,7 +109,6 @@ app.use(cors());
 app.use(session({
   secret: 'keybord cat',
   resave: true,
-  saveUninitialized: true
 }));
 //Messages middleware
 app.use(require('connect-flash')());
@@ -336,13 +349,51 @@ app.get('/api/votedProjects', (req, res) => {
     });
 });
 function slash_votesforuser(connection, sqlQuery, res) {
+
+// //acquire a connection
+// pool.acquire(function (err, connection) {
+//     if (err) {
+//         console.error(err);
+//         return;
+//     }
+
+//     //use the connection as normal
+//     var request = new Request(sqlQuery, function(err, rowCount) {
+//         if (err) {
+//             client.trackException( "Error with Tedious Request: "  + err);
+//             return;
+//         }
+
+//         console.log('rowCount: ' + rowCount);
+
+//         //release the connection back to the pool when finished
+//         connection.release();
+//     });
+
+//     request.on('row', function(columns) {
+//         console.log('value: ' + columns[0].value);
+//     });
+
+//     connection.execSql(request);
+// });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
     console.log("Success!" + sqlQuery);
-
-
-    // connection.close();          
-
-    // return res.status(200).json({"hi":"there"});
     if (rows == null || rows == 'undefined') {
       res.status(404);
     } else if (err) {
@@ -352,20 +403,18 @@ function slash_votesforuser(connection, sqlQuery, res) {
     else {
       var result = [];
       for (var r = 0; r < rows.length; r++) {
-        // console.log('*********RowStart************');
+      
         var item = {};
         for (var c = 0; c < rows[r].length; c++) {
-          item[rows[r][c].metadata.colName] = rows[r][c].value.toString();
-          // console.log(rows[r][c].metadata.colName);
-          // console.log(rows[r][c].value);
+          item[rows[r][c].metadata.colName] = rows[r][c].value.toString();    
         }
-        result.push(item);
-        // console.log('*********RowEnd************');
+        result.push(item); 
       }
       res.status(200);
       res.json(result);
       //  res.render('index',{pageTitle:'Your Votes',votes:result});
     }
+  connection.close();
   })
   ); // end execSql
 }; // end slash
@@ -570,7 +619,7 @@ app.get('/api/getRegisteredProjects', (req, res) => {
         var alias = req.query.alias
         slash_votesforuser(
           this,
-          "select pm.project_id, p.title,p.tagline, p.description,v.venue ,v.Location from ProjectMembers pm INNER JOIN Projects p on p.id=pm.project_id INNER JOIN Registration r on pm.project_id=r.project_id INNER JOIN venue v on r.venue_id = v.id where pm.alias ='" + req.query.alias + "'",
+          "select pm.project_id, p.title,p.tagline, p.description,v.venue ,v.Location from ProjectMembers pm INNER JOIN Projects p on p.id=pm.project_id INNER JOIN Registration r on pm.project_id=r.project_id INNER JOIN venue v on r.venue_id = v.id where pm.alias = '" + req.query.alias + "@microsoft.com'",
           res
         );
       }
