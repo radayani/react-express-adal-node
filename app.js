@@ -338,7 +338,11 @@ app.get('/api/votedProjects', (req, res) => {
 function slash_votesforuser(connection, sqlQuery, res) {
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
     console.log("Success!" + sqlQuery);
-    res.status(200).json({"hi":"there"});
+
+
+    connection.close();          
+
+    return res.status(200).json({"hi":"there"});
     // if (rows == null || rows == 'undefined') {
     //   res.status(404);
     // } else if (err) {
@@ -358,7 +362,6 @@ function slash_votesforuser(connection, sqlQuery, res) {
     //     result.push(item);
     //     // console.log('*********RowEnd************');
     //   }
-    connection.close();          
     //   res.status(200);
     //   res.json(result);
     //   //  res.render('index',{pageTitle:'Your Votes',votes:result});
