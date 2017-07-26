@@ -147,7 +147,7 @@ if (!parametersFile) {
 }
 
 var authorityUrl = sampleParameters.authorityHostUrl + '/' + sampleParameters.tenant;
-var redirectUri = 'http://sfvotes.azurewebsites.net/getAToken';
+var redirectUri = 'http://sfvote.azurewebsites.net/getAToken';
 // var redirectUri = 'http://localhost:3000/getAToken';
 var resource = '00000002-0000-0000-c000-000000000000';
 
@@ -214,7 +214,7 @@ app.get(`/home`, function (req, res) {
 });
 
 // ADAL LOGOUT
-var logoutAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=http://sfvotes.websites.net/loginAgain';
+var logoutAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=http://sfvote.websites.net/loginAgain';
 // var logoutAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=http://localhost:3002/api/login';
 
 app.get('/loginAgain', function (req, res) {

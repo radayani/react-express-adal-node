@@ -36,7 +36,7 @@ if (!parametersFile) {
 }
 
 var authorityUrl = sampleParameters.authorityHostUrl + '/' + sampleParameters.tenant;
-var redirectUri = 'http://sfvotes.azurewebsites.net/getAToken';
+var redirectUri = 'http://sfvote.azurewebsites.net/getAToken';
 // var redirectUri = 'http://localhost:3000/getAToken';
 var resource = '00000002-0000-0000-c000-000000000000';
 
