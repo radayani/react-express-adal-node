@@ -321,7 +321,7 @@ function validateFun(connection, sqlQuery, res) {
     }
     else {
       item = rows[0][0].value.toString();
-      res.status(200).send(item);
+      res.status(200).send({item:item});
       client.trackEvent("Pin Matched! Query: " + sqlQuery + " RowsCount: " + rowCount);
     }
     connection.close();
@@ -428,7 +428,12 @@ app.get('/api/votedProjects', (req, res) => {
 app.get('/api/fetchProjects', (req, res) => {
   new Connection(config)
     .on('connect',
-    function () {
+    function (err) {
+      if(err)
+      {
+        client.trackException("Error while creating db connection: " +err);
+        return;
+      }
       getRowsOfData(
         this,
         "SELECT p.id, p.title FROM projects p inner join registration r on r.project_id = p.id where title like '%" + req.query.filter + "%'",//Todo: SQL Injection Fix 
