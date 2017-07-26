@@ -20,14 +20,14 @@
     "express-validator": "^3.2.1",
     "jade": "^1.11.0",
     "morgan": "^1.8.2",
+    "newrelic": "^2.0.1",
     "nodemon": "^1.11.0",
     "serve-favicon": "^2.4.3",
     "serve-static": "^1.12.3",
     "tedious": "^2.0.0"
   },
-
-    "engines": {
+  "engines": {
     "node": ">= 8.0.0",
     "npm": ">= 5.0.0"
-  } 
+  }
 }
