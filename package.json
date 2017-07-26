@@ -24,9 +24,5 @@
     "serve-favicon": "^2.4.3",
     "serve-static": "^1.12.3",
     "tedious": "^2.0.0"
-  },
-  "engines": {
-    "node": ">= 8.0.0",
-    "npm": ">= 5.0.0"
   }
 }
