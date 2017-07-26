@@ -232,11 +232,11 @@ function getRowsOfData(connection, sqlQuery, res) {
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
     console.log("Success!" + sqlQuery);
     if (rows == null || rows == 'undefined') {
-      res.status(404).send({ status: 404, rowsZero: rows[0] });
-      client.trackException("4xx error: " + err + " Rows not found on call to getRowsOfData(): " + sqlQuery + " RowsCount: " + rowCount + " RowsZero: " + rows[0]);
+      res.status(404).send({ status: 404 });
+      client.trackException("4xx error: " + err + " Rows not found on call to getRowsOfData(): " + sqlQuery + " RowsCount: " + rowCount);
     } else if (err) {
       res.status(500).send({ status: 500, error: err });
-      client.trackException("5xx error: " + err + " Server Error on call to getRowsOfData(): " + sqlQuery + " RowsCount: " + rowCount + " RowsZero: " + rows[0]);
+      client.trackException("5xx error: " + err + " Server Error on call to getRowsOfData(): " + sqlQuery + " RowsCount: " + rowCount);
     }
     else {
       var result = [];
@@ -250,7 +250,7 @@ function getRowsOfData(connection, sqlQuery, res) {
       }
       res.status(200);
       res.json(result);
-      client.trackEvent("2xx/3xx: Success/Redirect on call to getRowsOfData(): " + sqlQuery + " RowsCount: " + rowCount + " RowsZero:" + rows[0] + " noOfRecordsReturned: " + result.length);
+      client.trackEvent("2xx/3xx: Success/Redirect on call to getRowsOfData(): " + sqlQuery + " RowsCount: " + rowCount +  " noOfRecordsReturned: " + result.length);
 
     }
     connection.close();
@@ -262,12 +262,12 @@ function getRowsOfData(connection, sqlQuery, res) {
 function getOneRowOfData(connection, sqlQuery, res) {
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
     if (rows == null || rows == 'undefined') {
-      res.status(404).send({ status: 404, rowsZero: rows[0] });
-      client.trackException("4xx error: " + err + "  Row not found on call to getOneRowOfData(): " + sqlQuery + " RowsCount: " + rowCount + " RowsZero:" + rows[0]);
+      res.status(404).send({ status: 404  });
+      client.trackException("4xx error: " + err + "  Row not found on call to getOneRowOfData(): " + sqlQuery + " RowsCount: " + rowCount);
 
     } else if (err) {
       res.status(500).send({ status: 500, error: err });
-      client.trackException("5xx error: " + err + "  Server Error on call to getOneRowOfData(): " + sqlQuery + " RowsCount: " + rowCount + " RowsZero:" + rows[0]);
+      client.trackException("5xx error: " + err + "  Server Error on call to getOneRowOfData(): " + sqlQuery + " RowsCount: " + rowCount);
 
     }
     else {
@@ -275,7 +275,7 @@ function getOneRowOfData(connection, sqlQuery, res) {
       item = rows[0][0].value.toString();
       res.status(200);
       res.json(item);
-      client.trackEvent("2xx/3xx: Success/Redirect on call to getOneRowOfData(): " + sqlQuery + " RowsCount: " + rowCount + " RowsZero:" + rows[0] + " recordReturned: " + item);
+      client.trackEvent("2xx/3xx: Success/Redirect on call to getOneRowOfData(): " + sqlQuery + " RowsCount: " + rowCount + " recordReturned: " + item);
 
     }
     connection.close();
@@ -288,17 +288,17 @@ function getOneRowOfData(connection, sqlQuery, res) {
 function saveRowOfData(connection, sqlQuery, res, req) {
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
     if (rows == null || rows == 'undefined') {
-      res.status(404).send({ status: 404, rowsZero: rows[0] });
-      client.trackException("4xx error: " + err + "   Row not found on call to saveRowOfData(): " + sqlQuery + " RowsCount: " + rowCount + " RowsZero:" + rows[0]);
+      res.status(404).send({ status: 404});
+      client.trackException("4xx error: " + err + "   Row not found on call to saveRowOfData(): " + sqlQuery + " RowsCount: " + rowCount);
 
     } else if (err) {
       res.status(500).send({ status: 500, error: err });
-      client.trackException("5xx error: " + err + "   Server Error on call to saveRowOfData(): " + sqlQuery + " RowsCount: " + rowCount + " RowsZero:" + rows[0]);
+      client.trackException("5xx error: " + err + "   Server Error on call to saveRowOfData(): " + sqlQuery + " RowsCount: " + rowCount );
 
     }
     else {
       res.status(200).send("Row Saved Successfully! ");
-      client.trackEvent("Row saved successfully! Query: " + sqlQuery + " RowsCount: " + rowCount + " RowsZero: " + rows[0]);
+      client.trackEvent("Row saved successfully! Query: " + sqlQuery + " RowsCount: " + rowCount );
     }
     connection.close();
 
@@ -311,18 +311,18 @@ function validateFun(connection, sqlQuery, res) {
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
     var item = "";
     if (rows == null || rows == 'undefined') {
-      res.status(404).send({ status: 400, rows: rows[0] });
-      client.trackException("4xx error: " + err + " Row not found on call to validateFun(): " + sqlQuery + " RowsCount: " + rowCount + " RowsZero:" + rows[0]);
+      res.status(404).send({ status: 400  });
+      client.trackException("4xx error: " + err + " Row not found on call to validateFun(): " + sqlQuery + " RowsCount: " + rowCount);
 
     } else if (err) {
       res.status(500).send({ status: 500, error: err });
-      client.trackException("5xx error: " + err + "   Server Error on call to validateFun(): " + sqlQuery + " RowsCount: " + rowCount + " RowsZero:" + rows[0]);
+      client.trackException("5xx error: " + err + "   Server Error on call to validateFun(): " + sqlQuery + " RowsCount: " + rowCount);
 
     }
     else {
       item = rows[0][0].value.toString();
       res.status(200).send(item);
-      client.trackEvent("Pin Matched! Query: " + sqlQuery + " RowsCount: " + rowCount + " RowsZero: " + rows[0]);
+      client.trackEvent("Pin Matched! Query: " + sqlQuery + " RowsCount: " + rowCount);
     }
     connection.close();
   })
@@ -335,12 +335,12 @@ function getPinAndRedirectToHomePage(connection, sqlQuery, res) {
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
 
     if (rows[0] == undefined || rows == null || rows == 'undefined') {
-      res.status(404).send({ status: 400, rows: rows[0] });
-      client.trackException("4xx error: " + err + " Row not found on call to getPinAndRedirectToHomePage(): " + sqlQuery + " RowsCount: " + rowCount + " RowsZero:" + rows[0]);
+      res.status(404).send({ status: 400 });
+      client.trackException("4xx error: " + err + " Row not found on call to getPinAndRedirectToHomePage(): " + sqlQuery + " RowsCount: " + rowCount );
 
     } else if (err) {
       res.status(500).send({ status: 500, error: err });
-      client.trackException("5xx error: " + err + "   Server Error on call to getPinAndRedirectToHomePage(): " + sqlQuery + " RowsCount: " + rowCount + " RowsZero:" + rows[0]);
+      client.trackException("5xx error: " + err + "   Server Error on call to getPinAndRedirectToHomePage(): " + sqlQuery + " RowsCount: " + rowCount);
 
     }
     else {
@@ -349,7 +349,7 @@ function getPinAndRedirectToHomePage(connection, sqlQuery, res) {
       res.cookie('myPIN', item);
       res.status(200);
       res.redirect(`/home`);
-      client.trackEvent("Pin Exists, Redirect to Home! Query: " + sqlQuery + " RowsCount: " + rowCount + " RowsZero: " + rows[0]);
+      client.trackEvent("Pin Exists, Redirect to Home! Query: " + sqlQuery + " RowsCount: " + rowCount );
 
     }
     connection.close();
@@ -375,7 +375,7 @@ function execNonQueryNew(connection, sqlQuery, res) {
         }
         else {
           res.status(200).send({ status: 200 });
-          client.trackEvent("Save Query Executed Successfully! Query: " + sqlQuery + " RowsCount: " + rowCount + " RowsZero: " + rows[0]);
+          client.trackEvent("Save Query Executed Successfully! Query: " + sqlQuery + " RowsCount: " + rowCount );
 
         }
         connection.close();
