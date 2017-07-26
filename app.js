@@ -1,3 +1,4 @@
+require('newrelic');
 var express = require('express');
 const appInsights = require("applicationinsights");
 appInsights.setup("75234f11-9d11-442d-bcbe-8a54064621a0")
