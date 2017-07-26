@@ -248,8 +248,8 @@ function getRowsOfData(connection, sqlQuery, res) {
         }
         result.push(item);
       }
-      //res.status(200);
-      res.status(200).json(result);
+      res.status(200);
+      res.json(result);
       client.trackEvent("2xx/3xx: Success/Redirect on call to getRowsOfData(): " + sqlQuery + " RowsCount: " + rowCount + " noOfRecordsReturned: " + result.length);
 
     }
@@ -273,21 +273,22 @@ function getOneRowOfData(connection, sqlQuery, res) {
     else {
       var item = {};
       item = rows[0][0].value.toString();
-      res.status(200).json(item);
+      res.status(200);
+      res.json(item);
       client.trackEvent("2xx/3xx: Success/Redirect on call to getOneRowOfData(): " + sqlQuery + " RowsCount: " + rowCount + " recordReturned: " + item);
 
     }
     connection.close();
 
   })
-  ); // end execSql
+  ); // end execSql
 };
 
 
 function saveRowOfData(connection, sqlQuery, res, req) {
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
     if (rows == null || rows == 'undefined') {
-      res.status(404).send({ status: 404 });
+      res.status(404).send({ status: 404, });
       client.trackException("4xx error: " + err + "   Row not found on call to saveRowOfData(): " + sqlQuery + " RowsCount: " + rowCount);
 
     } else if (err) {
@@ -310,7 +311,7 @@ function validateFun(connection, sqlQuery, res) {
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
     var item = "";
     if (rows == null || rows == 'undefined') {
-      res.status(404).send({ status: 400 });
+      res.status(404).send({ status: 400, rows: rows[0] });
       client.trackException("4xx error: " + err + " Row not found on call to validateFun(): " + sqlQuery + " RowsCount: " + rowCount);
 
     } else if (err) {
@@ -334,7 +335,7 @@ function getPinAndRedirectToHomePage(connection, sqlQuery, res) {
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
 
     if (rows[0] == undefined || rows == null || rows == 'undefined') {
-      res.status(404).send({ status: 400 });
+      res.status(404).send({ status: 400, rows: rows[0] });
       client.trackException("4xx error: " + err + " Row not found on call to getPinAndRedirectToHomePage(): " + sqlQuery + " RowsCount: " + rowCount);
 
     } else if (err) {
@@ -375,6 +376,7 @@ function execNonQueryNew(connection, sqlQuery, res) {
         else {
           res.status(200).send({ status: 200 });
           client.trackEvent("Save Query Executed Successfully! Query: " + sqlQuery + " RowsCount: " + rowCount);
+
         }
         connection.close();
       }
@@ -402,7 +404,7 @@ app.get('/api/getAvailableLocation', (req, res) => {
     function () {
       getRowsOfData(
         this,
-        "SELECT id,venue, Location FROM venue WHERE AllowedBooths>AllocatedBooths and venue like '%" + req.query.venue + "%'", //Todo: SQL Injection Fix
+        "SELECT id,venue, Location FROM venue WHERE AllowedBooths>AllocatedBooths and venue like '%" + req.query.venue + "%'", //Todo: SQL Injection Fix
         res
       );
     });
@@ -424,18 +426,17 @@ app.get('/api/votedProjects', (req, res) => {
 
 //*******GET PROJECTS TO SEARCH FROM AND VOTE API*********TESTED**    ------------------BUT FIX SQL  --------------//
 app.get('/api/fetchProjects', (req, res) => {
-  new Connection(config).on('connect', function (err) {
-    if (err)
-      {
-        client.trackException("Error connecting to SQL Server: " + err);
-        res.status(404).send(err);
-      }
-    getRowsOfData(
-      this,
-      "SELECT TOP 10 p.id, p.title FROM projects p WITH (NOLOCK) inner join registration r WITH (NOLOCK) on r.project_id = p.id where title like '%" + req.query.filter + "%'",
-      res
-    );
-  });
+  new Connection(config)
+    .on('connect',
+    function () {
+      getRowsOfData(
+        this,
+        "SELECT p.id, p.title FROM projects p inner join registration r on r.project_id = p.id where title like '%" + req.query.filter + "%'",//Todo: SQL Injection Fix 
+
+        // "SELECT id,title FROM Projects WHERE title like '%" + req.query.filter + "%'",//Todo: SQL Injection Fix
+        res
+      );
+    });
 });
 
 //*******GET UNREGISTERED PROJECTS API*********TESTED**//
@@ -452,14 +453,15 @@ app.get('/api/getMyUnRegProjects', (req, res) => {
 
 //*******SAVE VOTE API*********TESTED**//
 app.get('/api/castVote', function (req, res) {
-  new Connection(config).on('connect', function () {
-    saveRowOfData(
-      this,
-      "INSERT INTO Votes (id,alias) SELECT " + req.query.id + ",'" + req.query.alias + "'  WHERE NOT EXISTS (SELECT * FROM Votes WHERE id=" + req.query.id + " AND alias='" + req.query.alias + "')",//Todo: SQL Injection Fix
-      res,
-      req
-    );
-  });
+  new Connection(config).on('connect',
+    function () {
+      saveRowOfData(
+        this,
+        "INSERT INTO Votes (id,alias) SELECT " + req.query.id + ",'" + req.query.alias + "'  WHERE NOT EXISTS (SELECT * FROM Votes WHERE id=" + req.query.id + " AND alias='" + req.query.alias + "')",//Todo: SQL Injection Fix
+        res,
+        req
+      );
+    });
 });
 
 
