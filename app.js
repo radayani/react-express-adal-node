@@ -8,6 +8,9 @@ appInsights.setup("75234f11-9d11-442d-bcbe-8a54064621a0")
   .setAutoCollectExceptions(true)
   .setAutoCollectDependencies(true)
   .start();
+
+
+
 var fs = require('fs');
 var crypto = require('crypto');
 var AuthenticationContext = require('adal-node').AuthenticationContext;
@@ -22,6 +25,10 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var serveStatic = require('serve-static');
 var client = appInsights.getClient("75234f11-9d11-442d-bcbe-8a54064621a0");
+
+
+
+
 //Db
 var Connection = require('tedious').Connection;
 var Request = require('tedious').Request;
@@ -40,8 +47,14 @@ var config =
 
     }
   }
+
+
+
 var index = require('./routes/index');
+
+
 var app = express();
+
 
 // server side view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -53,24 +66,27 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(serveStatic('D:\home\site\wwwroot\public'));
-
 app.get('/home/*', function (req, res) {
   res.sendFile(__dirname + '/public/index.html');
 });
 app.use(cors());
+
 
 //Session middleware
 app.use(session({
   secret: 'keybord cat',
   resave: true,
 }));
-
 //Messages middleware
 app.use(require('connect-flash')());
 app.use(function (req, res, next) {
   res.locals.messages = require('express-messages')(req, res);
   next();
 });
+
+
+
+
 
 //Message validator
 app.use(expressValidator({
@@ -134,7 +150,9 @@ var authorityUrl = sampleParameters.authorityHostUrl + '/' + sampleParameters.te
 var redirectUri = 'http://sfvotes.azurewebsites.net/getAToken';
 // var redirectUri = 'http://localhost:3000/getAToken';
 var resource = '00000002-0000-0000-c000-000000000000';
+
 var templateAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/authorize?response_type=code&client_id=<client_id>&redirect_uri=<redirect_uri>&state=<state>&resource=<resource>';
+
 
 function createAuthorizationUrl(state) {
   var authorizationUrl = templateAuthzUrl.replace('<client_id>', sampleParameters.clientId);
@@ -147,8 +165,10 @@ function createAuthorizationUrl(state) {
 app.get('/api/login', function (req, res) {
   crypto.randomBytes(48, function (ex, buf) {
     var token = buf.toString('base64').replace(/\//g, '_').replace(/\+/g, '-');
+
     res.cookie('authstate', token);
     var authorizationUrl = createAuthorizationUrl(token);
+
     res.redirect(authorizationUrl);
   });
 });
@@ -167,6 +187,7 @@ app.get('/getAToken', function (req, res) {
       message = 'error: ' + err.message + '\n';
     }
     message += 'response: ' + JSON.stringify(response);
+
     res.cookie('access_token', response.accessToken);
     res.cookie('alias', alias);
     if (err) {
