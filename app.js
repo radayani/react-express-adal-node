@@ -248,8 +248,8 @@ function getRowsOfData(connection, sqlQuery, res) {
         }
         result.push(item);
       }
-      res.status(200);
-      res.json(result);
+      //res.status(200);
+      res.status(200).json(result);
       client.trackEvent("2xx/3xx: Success/Redirect on call to getRowsOfData(): " + sqlQuery + " RowsCount: " + rowCount +  " noOfRecordsReturned: " + result.length);
 
     }
@@ -273,8 +273,7 @@ function getOneRowOfData(connection, sqlQuery, res) {
     else {
       var item = {};
       item = rows[0][0].value.toString();
-      res.status(200);
-      res.json(item);
+      res.status(200).json(item);
       client.trackEvent("2xx/3xx: Success/Redirect on call to getOneRowOfData(): " + sqlQuery + " RowsCount: " + rowCount + " recordReturned: " + item);
 
     }
