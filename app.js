@@ -31,6 +31,7 @@ var client = appInsights.getClient("75234f11-9d11-442d-bcbe-8a54064621a0");
 
 //Db
 var Connection = require('tedious').Connection;
+const DEFAULT_CONNECT_RETRY_INTERVAL = 1000;
 var Request = require('tedious').Request;
 var config =
   {
@@ -44,6 +45,8 @@ var config =
       , rowCollectionOnRequestCompletion: true
 
       , instancename: 'SQLEXPRESS'
+      , maxRetriesOnTransientErrors: 5
+      , connectionRetryInterval:  DEFAULT_CONNECT_RETRY_INTERVAL
 
     }
   }
