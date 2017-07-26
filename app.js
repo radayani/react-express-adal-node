@@ -535,7 +535,7 @@ app.get('/api/getPin', (req, res) => {
   new Connection(config).on('connect', function () {
     getPinAndRedirectToHomePage(
       this,
-      "SELECT unique_pin FROM UniquePin WHERE alias like '%" + req.query.alias + "%'",//Todo: SQL Injection Fix
+      "SELECT unique_pin FROM UniquePin WHERE alias = '" + req.query.alias + "'",//Todo: SQL Injection Fix
       res
     );
   });
