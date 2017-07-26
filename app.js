@@ -1,4 +1,3 @@
-require('newrelic');
 var express = require('express');
 const appInsights = require("applicationinsights");
 appInsights.setup("75234f11-9d11-442d-bcbe-8a54064621a0")
@@ -236,11 +235,14 @@ function getRowsOfData(connection, sqlQuery, res) {
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
     console.log("Success!" + sqlQuery);
     if (rows == null || rows == 'undefined') {
-      res.status(404).send({ status: 404 });
       client.trackException("4xx error: " + err + " Rows not found on call to getRowsOfData(): " + sqlQuery + " RowsCount: " + rowCount);
+      res.status(404).send({ status: 404 });
+      return;
     } else if (err) {
-      res.status(500).send({ status: 500, error: err });
       client.trackException("5xx error: " + err + " Server Error on call to getRowsOfData(): " + sqlQuery + " RowsCount: " + rowCount);
+      
+      res.status(500).send({ status: 500, error: err });
+      return;
     }
     else {
       var result = [];
