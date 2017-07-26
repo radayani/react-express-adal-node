@@ -47,7 +47,7 @@ var config =
       , instancename: 'SQLEXPRESS'
       , maxRetriesOnTransientErrors: 5
       , connectionRetryInterval:  DEFAULT_CONNECT_RETRY_INTERVAL
-      , requestTimout:30000 
+      , requestTimeout:30000 
     }
   }
 
