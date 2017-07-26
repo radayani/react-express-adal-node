@@ -250,7 +250,7 @@ function getRowsOfData(connection, sqlQuery, res) {
       }
       //res.status(200);
       res.status(200).json(result);
-      client.trackEvent("2xx/3xx: Success/Redirect on call to getRowsOfData(): " + sqlQuery + " RowsCount: " + rowCount +  " noOfRecordsReturned: " + result.length);
+      client.trackEvent("2xx/3xx: Success/Redirect on call to getRowsOfData(): " + sqlQuery + " RowsCount: " + rowCount + " noOfRecordsReturned: " + result.length);
 
     }
     connection.close();
@@ -262,7 +262,7 @@ function getRowsOfData(connection, sqlQuery, res) {
 function getOneRowOfData(connection, sqlQuery, res) {
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
     if (rows == null || rows == 'undefined') {
-      res.status(404).send({ status: 404  });
+      res.status(404).send({ status: 404 });
       client.trackException("4xx error: " + err + "  Row not found on call to getOneRowOfData(): " + sqlQuery + " RowsCount: " + rowCount);
 
     } else if (err) {
@@ -287,17 +287,17 @@ function getOneRowOfData(connection, sqlQuery, res) {
 function saveRowOfData(connection, sqlQuery, res, req) {
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
     if (rows == null || rows == 'undefined') {
-      res.status(404).send({ status: 404});
+      res.status(404).send({ status: 404 });
       client.trackException("4xx error: " + err + "   Row not found on call to saveRowOfData(): " + sqlQuery + " RowsCount: " + rowCount);
 
     } else if (err) {
       res.status(500).send({ status: 500, error: err });
-      client.trackException("5xx error: " + err + "   Server Error on call to saveRowOfData(): " + sqlQuery + " RowsCount: " + rowCount );
+      client.trackException("5xx error: " + err + "   Server Error on call to saveRowOfData(): " + sqlQuery + " RowsCount: " + rowCount);
 
     }
     else {
       res.status(200).send("Row Saved Successfully! ");
-      client.trackEvent("Row saved successfully! Query: " + sqlQuery + " RowsCount: " + rowCount );
+      client.trackEvent("Row saved successfully! Query: " + sqlQuery + " RowsCount: " + rowCount);
     }
     connection.close();
 
@@ -310,7 +310,7 @@ function validateFun(connection, sqlQuery, res) {
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
     var item = "";
     if (rows == null || rows == 'undefined') {
-      res.status(404).send({ status: 400  });
+      res.status(404).send({ status: 400 });
       client.trackException("4xx error: " + err + " Row not found on call to validateFun(): " + sqlQuery + " RowsCount: " + rowCount);
 
     } else if (err) {
@@ -335,7 +335,7 @@ function getPinAndRedirectToHomePage(connection, sqlQuery, res) {
 
     if (rows[0] == undefined || rows == null || rows == 'undefined') {
       res.status(404).send({ status: 400 });
-      client.trackException("4xx error: " + err + " Row not found on call to getPinAndRedirectToHomePage(): " + sqlQuery + " RowsCount: " + rowCount );
+      client.trackException("4xx error: " + err + " Row not found on call to getPinAndRedirectToHomePage(): " + sqlQuery + " RowsCount: " + rowCount);
 
     } else if (err) {
       res.status(500).send({ status: 500, error: err });
@@ -348,7 +348,7 @@ function getPinAndRedirectToHomePage(connection, sqlQuery, res) {
       res.cookie('myPIN', item);
       res.status(200);
       res.redirect(`/home`);
-      client.trackEvent("Pin Exists, Redirect to Home! Query: " + sqlQuery + " RowsCount: " + rowCount );
+      client.trackEvent("Pin Exists, Redirect to Home! Query: " + sqlQuery + " RowsCount: " + rowCount);
 
     }
     connection.close();
@@ -374,8 +374,7 @@ function execNonQueryNew(connection, sqlQuery, res) {
         }
         else {
           res.status(200).send({ status: 200 });
-          client.trackEvent("Save Query Executed Successfully! Query: " + sqlQuery + " RowsCount: " + rowCount );
-
+          client.trackEvent("Save Query Executed Successfully! Query: " + sqlQuery + " RowsCount: " + rowCount);
         }
         connection.close();
       }
@@ -425,17 +424,18 @@ app.get('/api/votedProjects', (req, res) => {
 
 //*******GET PROJECTS TO SEARCH FROM AND VOTE API*********TESTED**    ------------------BUT FIX SQL  --------------//
 app.get('/api/fetchProjects', (req, res) => {
-  new Connection(config)
-    .on('connect',
-    function () {
-      getRowsOfData(
-        this,
-        "SELECT p.id, p.title FROM projects p inner join registration r on r.project_id = p.id where title like '%" + req.query.filter + "%'",//Todo: SQL Injection Fix 
-
-        // "SELECT id,title FROM Projects WHERE title like '%" + req.query.filter + "%'",//Todo: SQL Injection Fix
-        res
-      );
-    });
+  new Connection(config).on('connect', function (err) {
+    if (err)
+      {
+        client.trackException("Error connecting to SQL Server: " + err);
+        res.status(404).send(err);
+      }
+    getRowsOfData(
+      this,
+      "SELECT TOP 10 p.id, p.title FROM projects p WITH (NOLOCK) inner join registration r WITH (NOLOCK) on r.project_id = p.id where title like '%" + req.query.filter + "%'",
+      res
+    );
+  });
 });
 
 //*******GET UNREGISTERED PROJECTS API*********TESTED**//
@@ -452,15 +452,14 @@ app.get('/api/getMyUnRegProjects', (req, res) => {
 
 //*******SAVE VOTE API*********TESTED**//
 app.get('/api/castVote', function (req, res) {
-  new Connection(config).on('connect',
-    function () {
-      saveRowOfData(
-        this,
-        "INSERT INTO Votes (id,alias) SELECT " + req.query.id + ",'" + req.query.alias + "'  WHERE NOT EXISTS (SELECT * FROM Votes WHERE id=" + req.query.id + " AND alias='" + req.query.alias + "')",//Todo: SQL Injection Fix
-        res,
-        req
-      );
-    });
+  new Connection(config).on('connect', function () {
+    saveRowOfData(
+      this,
+      "INSERT INTO Votes (id,alias) SELECT " + req.query.id + ",'" + req.query.alias + "'  WHERE NOT EXISTS (SELECT * FROM Votes WHERE id=" + req.query.id + " AND alias='" + req.query.alias + "')",//Todo: SQL Injection Fix
+      res,
+      req
+    );
+  });
 });
 
 
