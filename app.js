@@ -46,8 +46,8 @@ var config =
 
       , instancename: 'SQLEXPRESS'
       , maxRetriesOnTransientErrors: 5
-      , connectionRetryInterval:  DEFAULT_CONNECT_RETRY_INTERVAL
-      , requestTimeout:30000 
+      , connectionRetryInterval: DEFAULT_CONNECT_RETRY_INTERVAL
+      , requestTimeout: 30000
     }
   }
 
@@ -240,7 +240,7 @@ function getRowsOfData(connection, sqlQuery, res) {
       return;
     } else if (err) {
       client.trackException("5xx error: " + err + " Server Error on call to getRowsOfData(): " + sqlQuery + " RowsCount: " + rowCount);
-      
+
       res.status(500).send({ status: 500, error: err });
       return;
     }
@@ -327,7 +327,7 @@ function validateFun(connection, sqlQuery, res) {
     }
     else {
       item = rows[0][0].value.toString();
-      res.status(200).send({item:item});
+      res.status(200).send({ item: item });
       client.trackEvent("Pin Matched! Query: " + sqlQuery + " RowsCount: " + rowCount);
     }
     connection.close();
@@ -338,31 +338,34 @@ function validateFun(connection, sqlQuery, res) {
 
 
 function getPinAndRedirectToHomePage(connection, sqlQuery, res) {
+  console.log("entered slash_pin");
+
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
+    var item = "";
 
-    if (rows[0] == undefined || rows == null || rows == 'undefined') {
-      res.status(404).send({ status: 400, rows: rows[0] });
-      client.trackException("4xx error: " + err + " Row not found on call to getPinAndRedirectToHomePage(): " + sqlQuery + " RowsCount: " + rowCount);
+    {
 
-    } else if (err) {
-      res.status(500).send({ status: 500, error: err });
-      client.trackException("5xx error: " + err + "   Server Error on call to getPinAndRedirectToHomePage(): " + sqlQuery + " RowsCount: " + rowCount);
+      if (rows[0] == undefined) {
+        res.status(404);
 
+      }
+      else {
+
+        item = rows[0][0].value.toString();
+
+        res.cookie('myPIN', item);
+        res.status(200);
+
+
+      }
     }
-    else {
-      var item = "";
-      item = rows[0][0].value.toString();
-      res.cookie('myPIN', item);
-      res.status(200);
-      res.redirect(`/home`);
-      client.trackEvent("Pin Exists, Redirect to Home! Query: " + sqlQuery + " RowsCount: " + rowCount);
+    // res.json(item);
+    res.redirect(`/home`);
 
-    }
     connection.close();
   })
   ); // end execSql
-};
-
+}; 
 
 
 
@@ -435,9 +438,8 @@ app.get('/api/fetchProjects', (req, res) => {
   new Connection(config)
     .on('connect',
     function (err) {
-      if(err)
-      {
-        client.trackException("Error while creating db connection: " +err);
+      if (err) {
+        client.trackException("Error while creating db connection: " + err);
         return;
       }
       getRowsOfData(
@@ -534,15 +536,20 @@ app.get('/api/validatePin', (req, res) => {
 //*******GET PIN API*********TESTED**//
 app.get('/api/getPin', (req, res) => {
   new Connection(config).on('connect', function () {
-    // console.log("hello");
+    console.log("hello");
     getPinAndRedirectToHomePage(
       this,
       "SELECT unique_pin FROM UniquePin WHERE alias like '%" + req.query.alias + "%'",//Todo: SQL Injection Fix
       res
     );
+    console.log("bye" + res);
   });
+  // console.log("RES: " + res);
+  //   localStorage.setItem('myPin', res);
+  //   res.cookie('myPIN', res);
+  //   console.log(req.session);
+  //    res.sendFile(__dirname + '/public/index.html')
 });
-
 
 //*******GET REGISTERED PROJECTS API*********TESTED**//
 app.get('/api/getRegisteredProjects', (req, res) => {
