@@ -327,7 +327,7 @@ function validateFun(connection, sqlQuery, res) {
     }
     else {
       item = rows[0][0].value.toString();
-      res.status(200).send({ item: item });
+      res.status(200).send(item);
       client.trackEvent("Pin Matched! Query: " + sqlQuery + " RowsCount: " + rowCount);
     }
     connection.close();
