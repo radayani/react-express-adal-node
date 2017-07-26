@@ -338,34 +338,31 @@ function validateFun(connection, sqlQuery, res) {
 
 
 function getPinAndRedirectToHomePage(connection, sqlQuery, res) {
-  console.log("entered slash_pin");
-
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
-    var item = "";
 
-    {
+    if (rows[0] == undefined || rows == null || rows == 'undefined') {
+      res.status(404);
+      client.trackException("4xx error: " + err + " Row not found on call to getPinAndRedirectToHomePage(): " + sqlQuery + " RowsCount: " + rowCount);
 
-      if (rows[0] == undefined) {
-        res.status(404);
+    } else if (err) {
+      res.status(500).send({ status: 500, error: err });
+      client.trackException("5xx error: " + err + "   Server Error on call to getPinAndRedirectToHomePage(): " + sqlQuery + " RowsCount: " + rowCount);
 
-      }
-      else {
-
-        item = rows[0][0].value.toString();
-
-        res.cookie('myPIN', item);
-        res.status(200);
-
-
-      }
     }
-    // res.json(item);
+    else {
+      var item = "";
+      item = rows[0][0].value.toString();
+      res.cookie('myPIN', item);
+      res.status(200);
+      client.trackEvent("Pin Exists, Redirect to Home! Query: " + sqlQuery + " RowsCount: " + rowCount);
+
+    }
     res.redirect(`/home`);
 
     connection.close();
   })
   ); // end execSql
-}; 
+};
 
 
 
@@ -536,19 +533,12 @@ app.get('/api/validatePin', (req, res) => {
 //*******GET PIN API*********TESTED**//
 app.get('/api/getPin', (req, res) => {
   new Connection(config).on('connect', function () {
-    console.log("hello");
     getPinAndRedirectToHomePage(
       this,
       "SELECT unique_pin FROM UniquePin WHERE alias like '%" + req.query.alias + "%'",//Todo: SQL Injection Fix
       res
     );
-    console.log("bye" + res);
   });
-  // console.log("RES: " + res);
-  //   localStorage.setItem('myPin', res);
-  //   res.cookie('myPIN', res);
-  //   console.log(req.session);
-  //    res.sendFile(__dirname + '/public/index.html')
 });
 
 //*******GET REGISTERED PROJECTS API*********TESTED**//
