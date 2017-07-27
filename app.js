@@ -1,6 +1,6 @@
 var express = require('express');
 const appInsights = require("applicationinsights");
-appInsights.setup("75234f11-9d11-442d-bcbe-8a54064621a0")
+appInsights.setup("feba3ac1-3c1f-4906-8522-313a142846a7")
   .setAutoCollectConsole(true)
   .setAutoDependencyCorrelation(false)
   .setAutoCollectRequests(true)
@@ -24,7 +24,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var serveStatic = require('serve-static');
-var client = appInsights.getClient("75234f11-9d11-442d-bcbe-8a54064621a0");
+var client = appInsights.getClient("feba3ac1-3c1f-4906-8522-313a142846a7");
 
 
 
@@ -462,16 +462,18 @@ app.get('/api/getMyUnRegProjects', (req, res) => {
 });
 
 //*******SAVE VOTE API*********TESTED**//
-app.get('/api/castVote', function (req, res) {
-  new Connection(config).on('connect',
-    function () {
-      saveRowOfData(
-        this,
-        "INSERT INTO Votes (id,alias) SELECT " + req.query.id + ",'" + req.query.alias + "'  WHERE NOT EXISTS (SELECT * FROM Votes WHERE id=" + req.query.id + " AND alias='" + req.query.alias + "')",//Todo: SQL Injection Fix
-        res,
-        req
-      );
-    });
+app.get('/api/castVote', function (req, res, err) {
+
+  new Connection(config).on('connect', function () {
+    saveRowOfData(
+      this,
+      "INSERT INTO Votes (id,alias) SELECT " + req.query.id + ",'" + req.query.alias + "' WHERE NOT EXISTS (SELECT * FROM Votes WHERE id= " + req.query.id + " AND alias = '" + req.query.alias + "') 	AND (SELECT TOP 1 1 FROM UniquePin WHERE alias = '" + req.query.alias + "' AND unique_pin = '" + req.query.pin + "')=1",//Todo: SQL Injection Fix
+      res,
+      req
+    );
+    // console.log("INSERT INTO Votes (id,alias) SELECT " + req.query.id + ",'" + req.query.alias + "'  WHERE NOT EXISTS (SELECT * FROM Votes WHERE id=" + req.query.id + " AND alias='" + req.query.alias + "')");
+    console.log("INSERT INTO Votes (id,alias) SELECT " + req.query.id + ",'" + req.query.alias + "' WHERE NOT EXISTS (SELECT * FROM Votes WHERE id= " + req.query.id + " AND alias = '" + req.query.alias + "') 	AND (SELECT TOP 1 1 FROM UniquePin WHERE alias = '" + req.query.alias + "' AND unique_pin = '" + req.query.pin + "')=1");
+  });
 });
 
 
