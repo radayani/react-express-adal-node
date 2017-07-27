@@ -36,11 +36,11 @@ var Request = require('tedious').Request;
 var config =
   {
     userName: 'sciencefair',
-    password: 'twoweek@123',
-    server: 'sfvoteserver.database.windows.net',
+    password: 'oneweek@123',
+    server: 'sfdbserver.database.windows.net',
     options:
     {
-      database: 'sfvotedb'
+      database: 'sfdbppe'
       , encrypt: true
       , rowCollectionOnRequestCompletion: true
 
