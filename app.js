@@ -1,4 +1,16 @@
-var express = require('express');
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="app.js" company="Microsoft">
+//     Microsoft Copyright.
+// </copyright>
+// <summary>
+//   The main server file where all the middleware and authentication code resides (need to make it modularized)
+// </summary>
+// <author>
+//   Raveena Dayani (radayani)
+// </author>
+// --------------------------------------------------------------------------------------------------------------------
+
+// added Application Insights to send events, traces and catch exception logs
 const appInsights = require("applicationinsights");
 appInsights.setup("feba3ac1-3c1f-4906-8522-313a142846a7")
   .setAutoCollectConsole(true)
@@ -8,9 +20,10 @@ appInsights.setup("feba3ac1-3c1f-4906-8522-313a142846a7")
   .setAutoCollectExceptions(true)
   .setAutoCollectDependencies(true)
   .start();
+var client = appInsights.getClient("feba3ac1-3c1f-4906-8522-313a142846a7");
 
-
-
+// use require() to load and cache javascript modules
+var express = require('express');
 var fs = require('fs');
 var crypto = require('crypto');
 var AuthenticationContext = require('adal-node').AuthenticationContext;
@@ -24,15 +37,9 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var serveStatic = require('serve-static');
-var client = appInsights.getClient("feba3ac1-3c1f-4906-8522-313a142846a7");
-
-
-
-
-//Db
 var Connection = require('tedious').Connection;
-const DEFAULT_CONNECT_RETRY_INTERVAL = 1000;
 var Request = require('tedious').Request;
+// SQL DB Configuration
 var config =
   {
     userName: 'sciencefair',
@@ -43,53 +50,44 @@ var config =
       database: 'sfdbppe'
       , encrypt: true
       , rowCollectionOnRequestCompletion: true
-
       , instancename: 'SQLEXPRESS'
       , maxRetriesOnTransientErrors: 5
-      , connectionRetryInterval: DEFAULT_CONNECT_RETRY_INTERVAL
+      , connectionRetryInterval: 1000
       , requestTimeout: 30000
     }
   }
 
-
-
+// useless. default express app.js template has this api route
 var index = require('./routes/index');
-
-
 var app = express();
-
-
 // server side view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(serveStatic('D:\home\site\wwwroot\public'));
+
+// all routes which have the url starting with below should be sent to equivalent react application route
 app.get('/home/*', function (req, res) {
   res.sendFile(__dirname + '/public/index.html');
 });
 app.use(cors());
-
 
 //Session middleware
 app.use(session({
   secret: 'keybord cat',
   resave: true,
 }));
+
 //Messages middleware
 app.use(require('connect-flash')());
 app.use(function (req, res, next) {
   res.locals.messages = require('express-messages')(req, res);
   next();
 });
-
-
-
-
 
 //Message validator
 app.use(expressValidator({
@@ -109,8 +107,6 @@ app.use(expressValidator({
   }
 }));
 
-
-
 // ENSURE AUTHENTICATED FUNCTION FOR APIs
 // Simple route middleware to ensure user is authenticated. (section 4)
 //   Use this route middleware on any resource that needs to be protected. If
@@ -124,7 +120,6 @@ app.use(expressValidator({
 //   if(app.get('access_token'))
 //     return next();
 // }
-
 
 // ADAL LOGIN
 var parametersFile = process.argv[2] || process.env['ADAL_SAMPLE_PARAMETERS_FILE'];
@@ -151,11 +146,8 @@ if (!parametersFile) {
 
 var authorityUrl = sampleParameters.authorityHostUrl + '/' + sampleParameters.tenant;
 var redirectUri = 'http://sfvote.azurewebsites.net/getAToken';
-// var redirectUri = 'http://localhost:3000/getAToken';
 var resource = '00000002-0000-0000-c000-000000000000';
-
 var templateAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/authorize?response_type=code&client_id=<client_id>&redirect_uri=<redirect_uri>&state=<state>&resource=<resource>';
-
 
 function createAuthorizationUrl(state) {
   var authorizationUrl = templateAuthzUrl.replace('<client_id>', sampleParameters.clientId);
@@ -218,7 +210,6 @@ app.get(`/home`, function (req, res) {
 
 // ADAL LOGOUT
 var logoutAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=http://sfvote.websites.net/loginAgain';
-// var logoutAuthzUrl = 'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=http://localhost:3002/api/login';
 
 app.get('/loginAgain', function (req, res) {
   res.redirect('/api/login');
@@ -336,7 +327,6 @@ function validateFun(connection, sqlQuery, res) {
 };
 
 
-
 function getPinAndRedirectToHomePage(connection, sqlQuery, res) {
   connection.execSql(new Request(sqlQuery, function (err, rowCount, rows) {
 
@@ -430,7 +420,7 @@ app.get('/api/votedProjects', (req, res) => {
     });
 });
 
-//*******GET PROJECTS TO SEARCH FROM AND VOTE API*********TESTED**    ------------------BUT FIX SQL  --------------//
+//*******GET PROJECTS TO SEARCH FROM AND VOTE API*********TESTED**
 app.get('/api/fetchProjects', (req, res) => {
   new Connection(config)
     .on('connect',
@@ -472,7 +462,6 @@ client.trackException("INSERT INTO Votes (id,alias) SELECT " + req.query.id + ",
       res,
       req
     );
-    // console.log("INSERT INTO Votes (id,alias) SELECT " + req.query.id + ",'" + req.query.alias + "'  WHERE NOT EXISTS (SELECT * FROM Votes WHERE id=" + req.query.id + " AND alias='" + req.query.alias + "')");
   });
 });
 
