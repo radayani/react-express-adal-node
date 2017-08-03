@@ -454,7 +454,7 @@ app.get('/api/getMyUnRegProjects', (req, res) => {
 //*******SAVE VOTE API*********TESTED**//
 app.get('/api/castVote', function (req, res, err) {
 
-client.trackException("INSERT INTO Votes (id,alias) SELECT " + req.query.id + ",'" + req.query.alias + "' WHERE NOT EXISTS (SELECT * FROM Votes WHERE id= " + req.query.id + " AND alias = '" + req.query.alias + "') 	AND (SELECT TOP 1 1 FROM UniquePin WHERE alias = '" + req.query.alias + "' AND unique_pin = '" + req.query.pin + "')=1" + " ALIAS: " + alias);
+  client.trackException("INSERT INTO Votes (id,alias) SELECT " + req.query.id + ",'" + req.query.alias + "' WHERE NOT EXISTS (SELECT * FROM Votes WHERE id= " + req.query.id + " AND alias = '" + req.query.alias + "') 	AND (SELECT TOP 1 1 FROM UniquePin WHERE alias = '" + req.query.alias + "' AND unique_pin = '" + req.query.pin + "')=1" + " ALIAS: " + alias);
   new Connection(config).on('connect', function () {
     saveRowOfData(
       this,
